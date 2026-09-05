@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Morada Planos Color</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-label="Conversor de planos">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Conversor de planos</p>
+            <h1>Negro a #5c2483</h1>
+          </div>
+          <div class="status-pill" id="statusPill">Listo</div>
+        </header>
+
+        <section class="drop-zone" id="dropZone">
+          <input
+            id="fileInput"
+            type="file"
+            accept="application/pdf,image/png,image/jpeg"
+            multiple
+          />
+          <div class="drop-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img">
+              <path d="M12 3v12m0-12 4.5 4.5M12 3 7.5 7.5" />
+              <path d="M5 15v3a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-3" />
+            </svg>
+          </div>
+          <div>
+            <h2>Sube PDF, JPG o PNG</h2>
+            <p>Arrastra uno o varios planos, o selecciónalos desde tu equipo.</p>
+          </div>
+          <button class="primary-button" id="pickFilesButton" type="button">
+            Seleccionar archivos
+          </button>
+        </section>
+
+        <section class="controls" aria-label="Ajustes de detección">
+          <label>
+            Tolerancia de negro
+            <input id="thresholdInput" type="range" min="8" max="80" value="38" />
+          </label>
+          <span id="thresholdValue">38</span>
+          <label class="checkbox-line">
+            <input id="strictNeutralInput" type="checkbox" checked />
+            Proteger grises y colores
+          </label>
+          <label class="checkbox-line">
+            <input id="includeBaseInput" type="checkbox" />
+            Incluir base original
+          </label>
+        </section>
+
+        <section class="summary-grid" aria-label="Resumen">
+          <div>
+            <span id="fileCount">0</span>
+            <p>archivos</p>
+          </div>
+          <div>
+            <span id="pageCount">0</span>
+            <p>páginas / imágenes</p>
+          </div>
+          <div>
+            <span id="convertedCount">0</span>
+            <p>elementos negros detectados</p>
+          </div>
+        </section>
+
+        <section class="actions-bar">
+          <label class="format-select">
+            Formato
+            <select id="formatSelect">
+              <option value="svg">SVG editable</option>
+              <option value="ai">AI Illustrator</option>
+              <option value="pdf">PDF Illustrator</option>
+              <option value="jpg">JPG alta calidad</option>
+            </select>
+          </label>
+          <button id="exportSelectedButton" type="button" disabled>Exportar seleccionado</button>
+          <button id="exportAllButton" type="button" disabled>Exportar todo</button>
+          <button id="clearButton" type="button" disabled>Limpiar</button>
+        </section>
+
+        <section class="preview-area" id="previewArea" aria-live="polite">
+          <div class="empty-state">
+            <h2>La vista previa aparecerá aquí</h2>
+            <p>Verás cada plano en columnas antes/después, con descarga SVG, AI, PDF o JPG individual.</p>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <template id="pageTemplate">
+      <article class="page-card">
+        <div class="page-card__header">
+          <div>
+            <h3></h3>
+            <p></p>
+          </div>
+          <div class="download-group">
+            <button class="download-button download-svg" type="button">SVG</button>
+            <button class="download-button download-ai" type="button">AI</button>
+            <button class="download-button download-pdf" type="button">PDF</button>
+            <button class="download-button download-jpg" type="button">JPG</button>
+          </div>
+        </div>
+        <div class="comparison">
+          <figure>
+            <figcaption>Antes</figcaption>
+            <canvas class="source-canvas"></canvas>
+          </figure>
+          <figure>
+            <figcaption>Después</figcaption>
+            <canvas class="result-canvas"></canvas>
+          </figure>
+        </div>
+      </article>
+    </template>
+
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>
