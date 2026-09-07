@@ -1,7 +1,7 @@
 {
-  "name": "Pardo 664 Morada",
-  "short_name": "Pardo 664",
-  "description": "Aplicación offline para sala de ventas del proyecto Pardo 664 de Morada.",
+  "name": "Bustamante 175 Morada",
+  "short_name": "Bustamante 175",
+  "description": "Aplicación offline para sala de ventas del proyecto Bustamante 175 de Morada.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#fbf7f1",

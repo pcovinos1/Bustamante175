@@ -36,7 +36,7 @@ export default function App() {
   };
 
   if (loading || !project) {
-    return <div className="grid min-h-screen place-items-center bg-paper text-ink">Cargando Pardo 664...</div>;
+    return <div className="grid min-h-screen place-items-center bg-paper text-ink">Cargando Bustamante 175...</div>;
   }
 
   return (
@@ -255,7 +255,7 @@ function Home({ project, onNavigate }: { project: Project; onNavigate: (view: Vi
   const hero = project.galleries.find((item) => item.id === "fachada")?.images[0]?.src;
   return (
     <section className="screen-section relative overflow-hidden bg-ink text-white">
-      <img className="absolute inset-0 h-full w-full scale-[1.02] object-cover opacity-72 transition duration-700" src={hero} alt="Render principal Pardo 664" />
+      <img className="absolute inset-0 h-full w-full scale-[1.02] object-cover opacity-72 transition duration-700" src={hero} alt={`Render principal ${project.name}`} />
       <div className="absolute inset-0 bg-gradient-to-r from-ink/80 via-ink/30 to-transparent" />
       <div className="relative z-10 flex min-h-screen max-w-7xl flex-col justify-between px-6 pb-32 pt-8 md:px-12">
         <header className="flex items-center justify-between">
@@ -420,7 +420,7 @@ function ProjectPage({ project, onOpenGallery }: { project: Project; onOpenGalle
           content: (
             <div className="horizontal-editorial-layout">
               <button className="horizontal-editorial-image" onClick={() => onOpenGallery({ images, index: 0 })} type="button">
-                <img src={images[0]?.src} alt="Pardo 664" />
+                <img src={images[0]?.src} alt={project.name} />
               </button>
               <article>
                 <p className="eyebrow">{section.title}</p>
@@ -442,7 +442,7 @@ function ProjectPage({ project, onOpenGallery }: { project: Project; onOpenGalle
             <div className="horizontal-feature-layout">
               <article>
                 <p className="eyebrow">{projectFacadeGallery?.title ?? "Fachada y proyecto"}</p>
-                <h2 className="font-display text-4xl leading-tight md:text-6xl">Tres miradas a la arquitectura de Pardo 664.</h2>
+                <h2 className="font-display text-4xl leading-tight md:text-6xl">Tres miradas a la arquitectura de {project.name}.</h2>
                 <p>{section.summary}</p>
               </article>
               <div className="horizontal-image-strip">
@@ -898,7 +898,7 @@ function ContactPage({ project }: { project: Project }) {
       <div className="contact-layout">
         <div>
           <p className="eyebrow">Contacto</p>
-          <h1 className="editorial-title">Informes Pardo 664</h1>
+          <h1 className="editorial-title">Informes {project.name}</h1>
           <p className="editorial-lead">Una conversación directa con el equipo comercial de Morada.</p>
         </div>
         <div className="contact-lines">

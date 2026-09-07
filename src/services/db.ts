@@ -1,8 +1,9 @@
 import { openDB } from "idb";
 import type { Project } from "../types/project";
 import { initialProject } from "../data/initialProject";
+import { fetchRemoteProject } from "./files";
 
-const DB_NAME = "pardo-664-local";
+const DB_NAME = "bustamante-175-local";
 const STORE = "project";
 const PROJECT_KEY = "active";
 
@@ -14,7 +15,7 @@ const dbPromise = openDB(DB_NAME, 1, {
 
 export async function getProject(): Promise<Project> {
   const db = await safeDb();
-  if (!db) return initialProject;
+  if (!db) return fetchRemoteProject().catch(() => null).then((project) => project ?? initialProject);
 
   const saved = await db.get(STORE, PROJECT_KEY).catch(() => undefined);
   if (saved) {
@@ -22,8 +23,10 @@ export async function getProject(): Promise<Project> {
     await db.put(STORE, normalized, PROJECT_KEY).catch(() => undefined);
     return normalized;
   }
-  await db.put(STORE, initialProject, PROJECT_KEY).catch(() => undefined);
-  return initialProject;
+  const published = await fetchRemoteProject().catch(() => null);
+  const project = published ?? initialProject;
+  await db.put(STORE, project, PROJECT_KEY).catch(() => undefined);
+  return project;
 }
 
 export async function saveProject(project: Project): Promise<void> {

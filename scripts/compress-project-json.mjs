@@ -7,7 +7,7 @@ const target = process.argv[2] ?? "public/content/project.json";
 const maxDimension = Number(process.argv[3] ?? 2200);
 const quality = process.argv[4] ?? "82";
 const project = JSON.parse(readFileSync(target, "utf8"));
-const tmp = mkdtempSync(join(tmpdir(), "pardo-content-"));
+const tmp = mkdtempSync(join(tmpdir(), "bustamante-content-"));
 
 let optimized = 0;
 

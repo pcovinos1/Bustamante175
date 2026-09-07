@@ -23,10 +23,10 @@ export function formatBytes(bytes: number): string {
 
 export async function exportProjectZip(project: Project): Promise<void> {
   const zip = new JSZip();
-  zip.file("pardo-664-project.json", serializeProject(project));
+  zip.file("bustamante-175-project.json", serializeProject(project));
   zip.file(
     "README.txt",
-    `Pardo 664 Morada\nVersion: ${project.version.version}\nPublicado: ${project.version.publishedAt}\n\nImporta este ZIP desde el panel administrador de la app.`
+    `${project.name} Morada\nVersion: ${project.version.version}\nPublicado: ${project.version.publishedAt}\n\nImporta este ZIP desde el panel administrador de la app.`
   );
   const assets = collectAssetSources(project);
   await Promise.all(
@@ -41,7 +41,7 @@ export async function exportProjectZip(project: Project): Promise<void> {
     })
   );
   const blob = await zip.generateAsync({ type: "blob" });
-  downloadBlob(blob, `pardo-664-${project.version.version}-${project.version.publishedAt}.zip`);
+  downloadBlob(blob, `bustamante-175-${project.version.version}-${project.version.publishedAt}.zip`);
 }
 
 export async function exportProjectJson(project: Project): Promise<void> {
@@ -161,12 +161,12 @@ function extensionFromSource(src: string): string | undefined {
 
 export async function importProjectZip(file: File): Promise<Project> {
   const zip = await JSZip.loadAsync(file);
-  const json = zip.file("pardo-664-project.json");
-  if (!json) throw new Error("El ZIP no contiene pardo-664-project.json.");
+  const json = zip.file("bustamante-175-project.json") ?? zip.file("pardo-664-project.json");
+  if (!json) throw new Error("El ZIP no contiene bustamante-175-project.json.");
   const content = await json.async("string");
   const parsed = JSON.parse(content) as Project;
   if (!parsed.id || !parsed.typologies || !parsed.floorPlan) {
-    throw new Error("El paquete no parece ser una actualización válida de Pardo 664.");
+    throw new Error("El paquete no parece ser una actualización válida de Bustamante 175.");
   }
   return parsed;
 }

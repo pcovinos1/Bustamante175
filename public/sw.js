@@ -1,4 +1,4 @@
-const CACHE_NAME = "pardo-664-v5";
+const CACHE_NAME = "bustamante-175-v1";
 const APP_SHELL = ["./", "index.html", "manifest.webmanifest", "icon.svg", "offline-cache-manifest.json"];
 
 async function offlineFiles() {

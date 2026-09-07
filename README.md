@@ -1,6 +1,6 @@
-# Pardo 664 Morada - MVP offline para sala de ventas
+# Bustamante 175 Morada - MVP offline para sala de ventas
 
-Aplicación web local-first para presentar el proyecto inmobiliario Pardo 664 en tablet, iPad, laptop, computadora de escritorio y pantallas táctiles.
+Aplicación web local-first para presentar el proyecto inmobiliario Bustamante 175 en tablet, iPad, laptop, computadora de escritorio y pantallas táctiles.
 
 ## Arquitectura propuesta
 
@@ -9,8 +9,8 @@ Aplicación web local-first para presentar el proyecto inmobiliario Pardo 664 en
 - PWA con `public/sw.js` y `manifest.webmanifest` para instalación y uso offline.
 - IndexedDB para guardar el contenido publicado en cada dispositivo.
 - JSZip para exportar e importar paquetes locales de actualización.
-- Datos iniciales extraídos del PDF `PARDO-SMART-JUNIO2026-v2.pdf`.
-- Renders, planta típica y planos iniciales empaquetados como assets locales.
+- Datos publicados desde el administrador local en `public/content/project.json`.
+- Renders, planta típica y planos empaquetados en el JSON publicado.
 
 ## Estructura de carpetas
 
@@ -40,7 +40,7 @@ npm install
 Si aparece un error de permisos de caché de npm en la computadora, usar:
 
 ```bash
-npm install --cache /private/tmp/pardo-664-npm-cache
+npm install --cache /private/tmp/bustamante-175-npm-cache
 ```
 
 ## Ejecutar en desarrollo
@@ -168,7 +168,7 @@ Usar “Exportar actualización” antes de reemplazar planos o importar conteni
 
 El ZIP contiene:
 
-- `pardo-664-project.json`
+- `bustamante-175-project.json`
 - versión
 - fecha de publicación
 - textos
@@ -176,18 +176,14 @@ El ZIP contiene:
 - configuración de planta típica
 - tipologías y planos reemplazados desde el administrador
 
-## Datos iniciales extraídos del PDF
+## Datos publicados
 
 Incluye:
 
-- Nombre: Pardo 664.
+- Nombre: Bustamante 175.
 - Desarrollador: Morada.
-- Arquitectos: Nómena Arquitectura.
-- Ubicación: Av. José Pardo, Miraflores.
-- Certificación: LEED.
-- Estado: Lanzamiento.
-- Formatos: flats y dúplex.
-- Tipologías del MVP: A-1, A-2, A-3, A-4, A-5, B-1, B-2, B-3.
+- Ubicación: Bustamante 175, Barranco.
+- Textos, imágenes, áreas comunes, tipologías y configuración exportadas desde el administrador local.
 - Áreas: desde 60 m² hasta 112 m² según ficha del PDF.
 - Áreas comunes: lobby, sala de espera, coworking, gimnasio, SUM, zona de parrillas, piscina, pet-wash, laundry-room y jardín.
 
