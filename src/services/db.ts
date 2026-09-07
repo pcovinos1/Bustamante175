@@ -13,26 +13,34 @@ const dbPromise = openDB(DB_NAME, 1, {
 });
 
 export async function getProject(): Promise<Project> {
-  const db = await dbPromise;
-  const saved = await db.get(STORE, PROJECT_KEY);
+  const db = await safeDb();
+  if (!db) return initialProject;
+
+  const saved = await db.get(STORE, PROJECT_KEY).catch(() => undefined);
   if (saved) {
     const normalized = normalizeProject(saved as Project);
-    await db.put(STORE, normalized, PROJECT_KEY);
+    await db.put(STORE, normalized, PROJECT_KEY).catch(() => undefined);
     return normalized;
   }
-  await db.put(STORE, initialProject, PROJECT_KEY);
+  await db.put(STORE, initialProject, PROJECT_KEY).catch(() => undefined);
   return initialProject;
 }
 
 export async function saveProject(project: Project): Promise<void> {
-  const db = await dbPromise;
+  const db = await safeDb();
+  if (!db) return;
   await db.put(STORE, project, PROJECT_KEY);
 }
 
 export async function resetProject(): Promise<Project> {
-  const db = await dbPromise;
-  await db.put(STORE, initialProject, PROJECT_KEY);
+  const db = await safeDb();
+  await db?.put(STORE, initialProject, PROJECT_KEY).catch(() => undefined);
   return initialProject;
+}
+
+async function safeDb() {
+  if (!("indexedDB" in window)) return null;
+  return dbPromise.catch(() => null);
 }
 
 function normalizeProject(project: Project): Project {
