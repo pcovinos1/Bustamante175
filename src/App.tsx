@@ -919,6 +919,33 @@ function AdminPage({ project, updateProject, reload, syncFromRemote }: { project
   const [selected, setSelected] = useState(project.typologies[0]?.id ?? "");
   const typology = project.typologies.find((item) => item.id === selected);
 
+  const addTypology = async () => {
+    const now = new Date().toISOString();
+    const code = nextTypologyCode(project.typologies);
+    const id = slugify(`typology-${code}-${Date.now()}`);
+    const basePlan = typology?.planSrc ?? project.floorPlan.imageSrc;
+    const nextTypology: Typology = {
+      id,
+      code,
+      areaM2: 0,
+      bedrooms: 1,
+      bathrooms: 1,
+      format: "Flat",
+      active: true,
+      planSrc: basePlan,
+      thumbnailSrc: basePlan,
+      floorThumbnailSrc: project.floorPlan.imageSrc,
+      rooms: [],
+      apartments: [],
+      features: {},
+      updatedAt: now,
+      notes: "Nueva tipología. Reemplazar plano y completar información comercial."
+    };
+    await updateProject((current) => ({ ...current, typologies: [...current.typologies, nextTypology] }));
+    setSelected(id);
+    setMessage(`Tipología ${code} agregada. Completa sus datos y reemplaza el plano.`);
+  };
+
   const publish = async (change: string) => {
     await updateProject((current) => bumpVersion({ ...current, lastPublishedSnapshot: current }, change));
     setMessage("Cambios publicados localmente.");
@@ -950,10 +977,17 @@ function AdminPage({ project, updateProject, reload, syncFromRemote }: { project
           <AdminGalleries project={project} updateProject={updateProject} />
           <AdminLocation project={project} updateProject={updateProject} />
           <div className="rounded border border-ink/10 bg-porcelain p-5">
-            <h2 className="section-title">Tipologías y planos</h2>
-            <select className="field mb-4" value={selected} onChange={(event) => setSelected(event.target.value)}>
-              {project.typologies.map((item) => <option key={item.id} value={item.id}>{item.code}</option>)}
-            </select>
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+              <div className="flex-1">
+                <h2 className="section-title">Tipologías y planos</h2>
+                <select className="field" value={selected} onChange={(event) => setSelected(event.target.value)}>
+                  {project.typologies.map((item) => <option key={item.id} value={item.id}>{item.code}</option>)}
+                </select>
+              </div>
+              <button className="primary-touch sm:self-end" onClick={() => void addTypology()} type="button">
+                <Plus className="size-4" /> Agregar tipología
+              </button>
+            </div>
             {typology ? <AdminTypology typology={typology} updateProject={updateProject} /> : null}
           </div>
           <div className="rounded border border-ink/10 bg-porcelain p-5">
@@ -1693,6 +1727,22 @@ function AdminTypology({ typology, updateProject }: { typology: Typology; update
       <img className="h-80 w-full rounded bg-white object-contain" src={typology.planSrc} alt={`Plano ${typology.code}`} />
       <div className="space-y-3">
         <label>Código<input className="field" value={typology.code} onChange={(event) => update({ code: event.target.value })} /></label>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <label>Área m²<input className="field" type="number" min="0" step="0.01" value={typology.areaM2} onChange={(event) => update({ areaM2: Number(event.target.value) || 0 })} /></label>
+          <label>Dormitorios<input className="field" type="number" min="0" step="1" value={typology.bedrooms} onChange={(event) => update({ bedrooms: Number(event.target.value) || 0 })} /></label>
+          <label>Baños<input className="field" type="number" min="0" step="1" value={typology.bathrooms ?? 0} onChange={(event) => update({ bathrooms: Number(event.target.value) || 0 })} /></label>
+        </div>
+        <label>
+          Formato
+          <select className="field" value={typology.format} onChange={(event) => update({ format: event.target.value as Typology["format"] })}>
+            <option value="Flat">Flat</option>
+            <option value="Duplex">Duplex</option>
+            <option value="Penthouse">Penthouse</option>
+            <option value="Garden home">Garden home</option>
+            <option value="Demostrativo">Demostrativo</option>
+          </select>
+        </label>
+        <label>Notas<textarea className="field min-h-24" value={typology.notes ?? ""} onChange={(event) => update({ notes: event.target.value })} /></label>
         <label className="flex items-center gap-2"><input type="checkbox" checked={typology.active} onChange={(event) => update({ active: event.target.checked })} /> Tipología activa</label>
         <p className="rounded bg-white px-3 py-2 text-sm text-ink/70">
           Tamaño sugerido: {imageSizeRecommendation("plano")}
@@ -1710,6 +1760,24 @@ function AdminTypology({ typology, updateProject }: { typology: Typology; update
       </div>
     </div>
   );
+}
+
+function nextTypologyCode(typologies: Typology[]): string {
+  const existing = new Set(typologies.map((item) => item.code.trim().toUpperCase()));
+  for (let index = typologies.length + 1; index < typologies.length + 100; index += 1) {
+    const code = `T-${index}`;
+    if (!existing.has(code.toUpperCase())) return code;
+  }
+  return `T-${Date.now().toString().slice(-4)}`;
+}
+
+function slugify(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 function AdminFiles({ project, selectedTypologyId, updateProject }: { project: Project; selectedTypologyId: string; updateProject: (updater: (project: Project) => Project) => Promise<void> }) {
