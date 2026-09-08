@@ -2,6 +2,7 @@ import { openDB } from "idb";
 import type { Project } from "../types/project";
 import { initialProject } from "../data/initialProject";
 import { fetchRemoteProject } from "./files";
+import { migratePlans } from "../data/migratePlans";
 
 const DB_NAME = "bustamante-175-local";
 const STORE = "project";
@@ -15,16 +16,16 @@ const dbPromise = openDB(DB_NAME, 1, {
 
 export async function getProject(): Promise<Project> {
   const db = await safeDb();
-  if (!db) return fetchRemoteProject().catch(() => null).then((project) => project ?? initialProject);
+  if (!db) return fetchRemoteProject().catch(() => null).then((project) => migratePlans(project ?? initialProject));
 
   const saved = await db.get(STORE, PROJECT_KEY).catch(() => undefined);
   if (saved) {
-    const normalized = normalizeProject(saved as Project);
+    const normalized = migratePlans(normalizeProject(saved as Project));
     await db.put(STORE, normalized, PROJECT_KEY).catch(() => undefined);
     return normalized;
   }
   const published = await fetchRemoteProject().catch(() => null);
-  const project = published ?? initialProject;
+  const project = migratePlans(published ?? initialProject);
   await db.put(STORE, project, PROJECT_KEY).catch(() => undefined);
   return project;
 }
@@ -37,8 +38,9 @@ export async function saveProject(project: Project): Promise<void> {
 
 export async function resetProject(): Promise<Project> {
   const db = await safeDb();
-  await db?.put(STORE, initialProject, PROJECT_KEY).catch(() => undefined);
-  return initialProject;
+  const project = migratePlans(initialProject);
+  await db?.put(STORE, project, PROJECT_KEY).catch(() => undefined);
+  return project;
 }
 
 async function safeDb() {

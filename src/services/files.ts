@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import type { Project } from "../types/project";
+import { migratePlans } from "../data/migratePlans";
 
 export function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -204,7 +205,7 @@ export async function fetchRemoteProject(current?: Project): Promise<Project | n
     throw new Error("El contenido publicado en GitHub no tiene un formato válido.");
   }
   if (current && compareProjectVersions(parsed, current) <= 0) return null;
-  return parsed;
+  return migratePlans(parsed);
 }
 
 function compareVersionStrings(a: string, b: string): number {

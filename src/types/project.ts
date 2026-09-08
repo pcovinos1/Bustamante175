@@ -139,6 +139,7 @@ export interface AboutContent {
 }
 
 export interface Project {
+  plansRevision?: string;
   id: string;
   name: string;
   developer: string;

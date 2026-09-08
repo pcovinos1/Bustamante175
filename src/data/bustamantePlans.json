@@ -1,0 +1,1201 @@
+{
+  "typologies": [
+    {
+      "id": "flat-x-01",
+      "code": "Flat X-01",
+      "areaM2": 44,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-x-01.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-x-01-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-x-01-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "201",
+          "label": "201"
+        },
+        {
+          "id": "301",
+          "label": "301"
+        },
+        {
+          "id": "401",
+          "label": "401"
+        },
+        {
+          "id": "501",
+          "label": "501"
+        },
+        {
+          "id": "601",
+          "label": "601"
+        },
+        {
+          "id": "701",
+          "label": "701"
+        },
+        {
+          "id": "801",
+          "label": "801"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 1. Vista externa"
+    },
+    {
+      "id": "flat-x-02",
+      "code": "Flat X-02",
+      "areaM2": 59,
+      "bedrooms": 2,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-x-02.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-x-02-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-x-02-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "402",
+          "label": "402"
+        },
+        {
+          "id": "502",
+          "label": "502"
+        },
+        {
+          "id": "602",
+          "label": "602"
+        },
+        {
+          "id": "702",
+          "label": "702"
+        },
+        {
+          "id": "802",
+          "label": "802"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 2. Vista externa"
+    },
+    {
+      "id": "flat-x-03",
+      "code": "Flat X-03",
+      "areaM2": 57,
+      "bedrooms": 2,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-x-03.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-x-03-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-x-03-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "403",
+          "label": "403"
+        },
+        {
+          "id": "503",
+          "label": "503"
+        },
+        {
+          "id": "603",
+          "label": "603"
+        },
+        {
+          "id": "703",
+          "label": "703"
+        },
+        {
+          "id": "803",
+          "label": "803"
+        },
+        {
+          "id": "903",
+          "label": "903"
+        },
+        {
+          "id": "1003",
+          "label": "1003"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 3. Vista externa"
+    },
+    {
+      "id": "flat-x-04",
+      "code": "Flat X-04",
+      "areaM2": 41,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-x-04.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-x-04-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-x-04-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "404",
+          "label": "404"
+        },
+        {
+          "id": "504",
+          "label": "504"
+        },
+        {
+          "id": "604",
+          "label": "604"
+        },
+        {
+          "id": "704",
+          "label": "704"
+        },
+        {
+          "id": "804",
+          "label": "804"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 4. Vista externa"
+    },
+    {
+      "id": "flat-x-05",
+      "code": "Flat X-05",
+      "areaM2": 42,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-x-05.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-x-05-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-x-05-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "205",
+          "label": "205"
+        },
+        {
+          "id": "305",
+          "label": "305"
+        },
+        {
+          "id": "405",
+          "label": "405"
+        },
+        {
+          "id": "505",
+          "label": "505"
+        },
+        {
+          "id": "605",
+          "label": "605"
+        },
+        {
+          "id": "705",
+          "label": "705"
+        },
+        {
+          "id": "805",
+          "label": "805"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 5. Vista externa"
+    },
+    {
+      "id": "flat-x-06",
+      "code": "Flat X-06",
+      "areaM2": 41,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-x-06.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-x-06-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-x-06-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "206",
+          "label": "206"
+        },
+        {
+          "id": "306",
+          "label": "306"
+        },
+        {
+          "id": "406",
+          "label": "406"
+        },
+        {
+          "id": "506",
+          "label": "506"
+        },
+        {
+          "id": "606",
+          "label": "606"
+        },
+        {
+          "id": "706",
+          "label": "706"
+        },
+        {
+          "id": "806",
+          "label": "806"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 6. Vista interna"
+    },
+    {
+      "id": "flat-x-07",
+      "code": "Flat X-07",
+      "areaM2": 41,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-x-07.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-x-07-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-x-07-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "105",
+          "label": "105"
+        },
+        {
+          "id": "207",
+          "label": "207"
+        },
+        {
+          "id": "307",
+          "label": "307"
+        },
+        {
+          "id": "407",
+          "label": "407"
+        },
+        {
+          "id": "507",
+          "label": "507"
+        },
+        {
+          "id": "607",
+          "label": "607"
+        },
+        {
+          "id": "707",
+          "label": "707"
+        },
+        {
+          "id": "807",
+          "label": "807"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 7. Vista interna"
+    },
+    {
+      "id": "flat-x-08",
+      "code": "Flat X-08",
+      "areaM2": 60,
+      "bedrooms": 2,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-x-08.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-x-08-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-x-08-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "106",
+          "label": "106"
+        },
+        {
+          "id": "208",
+          "label": "208"
+        },
+        {
+          "id": "308",
+          "label": "308"
+        },
+        {
+          "id": "408",
+          "label": "408"
+        },
+        {
+          "id": "508",
+          "label": "508"
+        },
+        {
+          "id": "608",
+          "label": "608"
+        },
+        {
+          "id": "708",
+          "label": "708"
+        },
+        {
+          "id": "808",
+          "label": "808"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 8. Vista interna"
+    },
+    {
+      "id": "flat-x-09",
+      "code": "Flat X-09",
+      "areaM2": 42,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-x-09.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-x-09-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-x-09-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "107",
+          "label": "107"
+        },
+        {
+          "id": "209",
+          "label": "209"
+        },
+        {
+          "id": "309",
+          "label": "309"
+        },
+        {
+          "id": "409",
+          "label": "409"
+        },
+        {
+          "id": "509",
+          "label": "509"
+        },
+        {
+          "id": "609",
+          "label": "609"
+        },
+        {
+          "id": "709",
+          "label": "709"
+        },
+        {
+          "id": "809",
+          "label": "809"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 9. Vista interna"
+    },
+    {
+      "id": "flat-x-10",
+      "code": "Flat X-10",
+      "areaM2": 43,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-x-10.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-x-10-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-x-10-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "108",
+          "label": "108"
+        },
+        {
+          "id": "210",
+          "label": "210"
+        },
+        {
+          "id": "310",
+          "label": "310"
+        },
+        {
+          "id": "410",
+          "label": "410"
+        },
+        {
+          "id": "510",
+          "label": "510"
+        },
+        {
+          "id": "610",
+          "label": "610"
+        },
+        {
+          "id": "710",
+          "label": "710"
+        },
+        {
+          "id": "810",
+          "label": "810"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 10. Vista interna"
+    },
+    {
+      "id": "flat-x-11",
+      "code": "Flat X-11",
+      "areaM2": 47,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-x-11.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-x-11-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-x-11-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "109",
+          "label": "109"
+        },
+        {
+          "id": "211",
+          "label": "211"
+        },
+        {
+          "id": "311",
+          "label": "311"
+        },
+        {
+          "id": "411",
+          "label": "411"
+        },
+        {
+          "id": "511",
+          "label": "511"
+        },
+        {
+          "id": "611",
+          "label": "611"
+        },
+        {
+          "id": "711",
+          "label": "711"
+        },
+        {
+          "id": "811",
+          "label": "811"
+        },
+        {
+          "id": "911",
+          "label": "911"
+        },
+        {
+          "id": "1011",
+          "label": "1011"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 11. Vista interna"
+    },
+    {
+      "id": "flat-101",
+      "code": "Flat 101",
+      "areaM2": 58,
+      "bedrooms": 2,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-101.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-101-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-101-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "101",
+          "label": "101"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 12. Vista externa"
+    },
+    {
+      "id": "flat-102",
+      "code": "Flat 102",
+      "areaM2": 56,
+      "bedrooms": 2,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-102.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-102-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-102-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "102",
+          "label": "102"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 13. Vista externa"
+    },
+    {
+      "id": "flat-103",
+      "code": "Flat 103",
+      "areaM2": 40,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-103.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-103-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-103-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "103",
+          "label": "103"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 14. Vista externa"
+    },
+    {
+      "id": "flat-104",
+      "code": "Flat 104",
+      "areaM2": 41,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-104.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-104-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-104-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "104",
+          "label": "104"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 15. Vista interna"
+    },
+    {
+      "id": "flat-202",
+      "code": "Flat 202",
+      "areaM2": 62,
+      "bedrooms": 2,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-202.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-202-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-202-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "202",
+          "label": "202"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 16. Vista externa"
+    },
+    {
+      "id": "flat-203",
+      "code": "Flat 203",
+      "areaM2": 61,
+      "bedrooms": 2,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-203.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-203-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-203-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "203",
+          "label": "203"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 17. Vista externa"
+    },
+    {
+      "id": "flat-204",
+      "code": "Flat 204",
+      "areaM2": 43,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-204.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-204-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-204-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "204",
+          "label": "204"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 18. Vista externa"
+    },
+    {
+      "id": "flat-303",
+      "code": "Flat 303",
+      "areaM2": 61,
+      "bedrooms": 2,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-303.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-303-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-303-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "303",
+          "label": "303"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 19. Vista externa"
+    },
+    {
+      "id": "flat-304",
+      "code": "Flat 304",
+      "areaM2": 43,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-304.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-304-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-304-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "304",
+          "label": "304"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 20. Vista externa"
+    },
+    {
+      "id": "flat-901",
+      "code": "Flat 901",
+      "areaM2": 42,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-901.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-901-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-901-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "901",
+          "label": "901"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 21. Vista externa"
+    },
+    {
+      "id": "flat-905",
+      "code": "Flat 905",
+      "areaM2": 40,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-905.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-905-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-905-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "905",
+          "label": "905"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 22. Vista externa"
+    },
+    {
+      "id": "flat-906",
+      "code": "Flat 906",
+      "areaM2": 41,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-906.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-906-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-906-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "906",
+          "label": "906"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 23. Vista interna"
+    },
+    {
+      "id": "flat-907",
+      "code": "Flat 907",
+      "areaM2": 43,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-907.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-907-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-907-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "907",
+          "label": "907"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 24. Vista interna"
+    },
+    {
+      "id": "flat-908",
+      "code": "Flat 908",
+      "areaM2": 59,
+      "bedrooms": 2,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-908.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-908-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-908-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "908",
+          "label": "908"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 25. Vista interna"
+    },
+    {
+      "id": "flat-909",
+      "code": "Flat 909",
+      "areaM2": 43,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-909.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-909-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-909-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "909",
+          "label": "909"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 26. Vista interna"
+    },
+    {
+      "id": "flat-910",
+      "code": "Flat 910",
+      "areaM2": 43,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-910.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-910-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-910-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "910",
+          "label": "910"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 27. Vista interna"
+    },
+    {
+      "id": "flat-1001",
+      "code": "Flat 1001",
+      "areaM2": 42,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-1001.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-1001-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-1001-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "1001",
+          "label": "1001"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 28. Vista externa"
+    },
+    {
+      "id": "flat-1005",
+      "code": "Flat 1005",
+      "areaM2": 40,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-1005.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-1005-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-1005-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "1005",
+          "label": "1005"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 29. Vista externa"
+    },
+    {
+      "id": "flat-1006",
+      "code": "Flat 1006",
+      "areaM2": 40,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-1006.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-1006-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-1006-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "1006",
+          "label": "1006"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 30. Vista interna"
+    },
+    {
+      "id": "flat-1007",
+      "code": "Flat 1007",
+      "areaM2": 40,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-1007.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-1007-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-1007-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "1007",
+          "label": "1007"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 31. Vista interna"
+    },
+    {
+      "id": "flat-1008",
+      "code": "Flat 1008",
+      "areaM2": 55,
+      "bedrooms": 2,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-1008.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-1008-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-1008-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "1008",
+          "label": "1008"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 32. Vista interna"
+    },
+    {
+      "id": "flat-1009",
+      "code": "Flat 1009",
+      "areaM2": 40,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-1009.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-1009-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-1009-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "1009",
+          "label": "1009"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 33. Vista interna"
+    },
+    {
+      "id": "flat-1010",
+      "code": "Flat 1010",
+      "areaM2": 40,
+      "bedrooms": 1,
+      "format": "Flat",
+      "active": true,
+      "planSrc": "content/plans/bustamante/flat-1010.webp",
+      "thumbnailSrc": "content/plans/bustamante/flat-1010-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/flat-1010-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "1010",
+          "label": "1010"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 34. Vista interna"
+    },
+    {
+      "id": "th-ss-01",
+      "code": "TH SS-01",
+      "areaM2": 77,
+      "bedrooms": 2,
+      "format": "TH",
+      "active": true,
+      "planSrc": "content/plans/bustamante/th-ss-01.webp",
+      "thumbnailSrc": "content/plans/bustamante/th-ss-01-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/th-ss-01-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "TH SS-01",
+          "label": "TH SS-01"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 35. Vista externa"
+    },
+    {
+      "id": "th-ss-03",
+      "code": "TH SS-03",
+      "areaM2": 50,
+      "bedrooms": 1,
+      "format": "TH",
+      "active": true,
+      "planSrc": "content/plans/bustamante/th-ss-03.webp",
+      "thumbnailSrc": "content/plans/bustamante/th-ss-03-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/th-ss-03-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "TH SS-03",
+          "label": "TH SS-03"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 36. Vista interna"
+    },
+    {
+      "id": "th-ss-04",
+      "code": "TH SS-04",
+      "areaM2": 74,
+      "bedrooms": 2,
+      "format": "TH",
+      "active": true,
+      "planSrc": "content/plans/bustamante/th-ss-04.webp",
+      "thumbnailSrc": "content/plans/bustamante/th-ss-04-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/th-ss-04-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "TH SS-04",
+          "label": "TH SS-04"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 37. Vista interna"
+    },
+    {
+      "id": "th-ss-05",
+      "code": "TH SS-05",
+      "areaM2": 78,
+      "bedrooms": 2,
+      "format": "TH",
+      "active": true,
+      "planSrc": "content/plans/bustamante/th-ss-05.webp",
+      "thumbnailSrc": "content/plans/bustamante/th-ss-05-thumb.webp",
+      "floorThumbnailSrc": "content/plans/bustamante/th-ss-05-location.webp",
+      "rooms": [],
+      "apartments": [
+        {
+          "id": "TH SS-05",
+          "label": "TH SS-05"
+        }
+      ],
+      "features": {
+        "terrace": false,
+        "study": false
+      },
+      "updatedAt": "2026-09-08",
+      "notes": "Fuente: bus.pdf, página 38. Vista interna"
+    }
+  ],
+  "floorPlan": {
+    "id": "bustamante-location",
+    "title": "Ubicación referencial en planta",
+    "imageSrc": "content/plans/bustamante/flat-x-01-location.webp",
+    "hotspots": [],
+    "updatedAt": "2026-09-08"
+  },
+  "areaRange": "40 a 78 m²",
+  "typologySummary": "38 planos de departamentos de 1 y 2 dormitorios."
+}
