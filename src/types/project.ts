@@ -72,7 +72,7 @@ export interface Typology {
   areaM2: number;
   bedrooms: number;
   bathrooms?: number;
-  format: "Flat" | "Duplex" | "Penthouse" | "Garden home" | "Demostrativo";
+  format: "TH" | "Flat" | "Duplex" | "Penthouse" | "Garden home" | "Demostrativo";
   active: boolean;
   planSrc: string;
   thumbnailSrc: string;

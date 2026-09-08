@@ -765,7 +765,7 @@ function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, o
   const [bedrooms, setBedrooms] = useState("Todos");
   const [area, setArea] = useState("Todas");
   const typologies = project.typologies.filter((item) => item.active);
-  const filtered = typologies.filter((item) => (bedrooms === "Todos" || item.bedrooms === Number(bedrooms)) && (area === "Todas" || (area === "60-65" ? item.areaM2 <= 65 : item.areaM2 > 65)));
+  const filtered = typologies.filter((item) => (bedrooms === "Todos" || item.bedrooms === Number(bedrooms)) && (area === "Todas" || (area === "<60" ? item.areaM2 < 60 : area === "60-65" ? item.areaM2 >= 60 && item.areaM2 <= 65 : item.areaM2 > 65)));
   return (
     <section className="page-wrap">
       <PageHeading eyebrow="Explorador" title="Departamentos y tipologías" />
@@ -775,13 +775,13 @@ function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, o
             {value === "Todos" ? "Todos los dormitorios" : `${value} dorm.`}
           </button>
         ))}
-        {["Todas", "60-65", "66+"].map((value) => (
+        {["Todas", "<60", "60-65", "66+"].map((value) => (
           <button key={value} className={`pill ${area === value ? "pill-active" : ""}`} onClick={() => setArea(value)} type="button">
-            {value === "Todas" ? "Todas las áreas" : value === "60-65" ? "60 a 65 m²" : "Más de 65 m²"}
+            {value === "Todas" ? "Todas las áreas" : value === "<60" ? "Menos de 60 m²" : value === "60-65" ? "60 a 65 m²" : "Más de 65 m²"}
           </button>
         ))}
         <button className="primary-touch ml-auto" onClick={() => onNavigate("floor")} type="button">
-          Ver planta típica <Grid3X3 />
+          Ver ubicación en planta <Grid3X3 />
         </button>
         <button className="secondary-touch" onClick={onOpenVirtualTour} type="button">
           Recorrido virtual <View className="size-5" />
@@ -820,15 +820,15 @@ function FloorPage({ project, selectedTypologyId, setSelectedTypologyId, onNavig
   const typology = project.typologies.find((item) => item.id === selectedTypologyId);
   return (
     <section className="page-wrap">
-      <PageHeading eyebrow="Planta típica" title="Pisos 3 al 12" text="La planta típica exhibida corresponde a los pisos 3 al 12 y se muestra únicamente para fines ilustrativos." />
+      <PageHeading eyebrow="Ubicación en planta" title={typology?.code ?? project.floorPlan.title} text="Ubicación referencial incluida en la ficha del departamento." />
       <div className="grid gap-6 lg:grid-cols-[1fr_330px]">
-        <FloorPlanInteractive floorPlan={project.floorPlan} typologies={project.typologies} selectedId={selectedTypologyId} onSelect={setSelectedTypologyId} />
+        <PlanViewer src={typology?.floorThumbnailSrc ?? project.floorPlan.imageSrc} title={`Ubicación ${typology?.code ?? "en planta"}`} />
         <aside className="rounded border border-ink/10 bg-porcelain p-5">
           {typology ? (
             <>
               <p className="text-sm uppercase tracking-[0.25em] text-morada">Seleccionado</p>
               <h2 className="mt-3 font-display text-6xl">{typology.code}</h2>
-              <p className="mt-2 text-xl">Tipología activa en planta</p>
+              <p className="mt-2 text-xl">Ubicación del departamento</p>
               <img className="mt-5 h-48 w-full rounded bg-white object-contain" src={typology.thumbnailSrc} alt={`Miniatura ${typology.code}`} />
               <button className="primary-touch mt-6 w-full" onClick={() => onNavigate("typology")} type="button">
                 Ver plano <ArrowRight />
@@ -1735,7 +1735,7 @@ function AdminTypology({ typology, updateProject }: { typology: Typology; update
         <label>
           Formato
           <select className="field" value={typology.format} onChange={(event) => update({ format: event.target.value as Typology["format"] })}>
-            <option value="Flat">Flat</option>
+            <option value="Flat">Flat</option><option value="TH">TH</option>
             <option value="Duplex">Duplex</option>
             <option value="Penthouse">Penthouse</option>
             <option value="Garden home">Garden home</option>
