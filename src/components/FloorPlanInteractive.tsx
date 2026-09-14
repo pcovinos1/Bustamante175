@@ -17,11 +17,27 @@ export function FloorPlanInteractive({ floorPlan, typologies, selectedId, editab
   const byId = new Map(typologies.map((typology) => [typology.id, typology]));
   const [imageRatio, setImageRatio] = useState<number | null>(null);
 
+  const [drawing, setDrawing] = useState(false);
+  const [corner, setCorner] = useState<{ x: number; y: number } | null>(null);
+
   const targetId = byId.has(selectedId ?? "") ? selectedId! : typologies[0]?.id ?? "";
 
   function addZone() {
     if (!targetId) return;
-    onHotspotAdd?.({ id: crypto.randomUUID(), typologyId: targetId, x: 40, y: 40, width: 15, height: 15 });
+    setCorner(null);
+    setDrawing(true);
+  }
+
+  function markCorner(event: React.MouseEvent<HTMLButtonElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const point = { x: clamp((event.clientX - rect.left) / rect.width * 100), y: clamp((event.clientY - rect.top) / rect.height * 100) };
+    if (!corner) { setCorner(point); return; }
+    const width = Math.abs(point.x - corner.x);
+    const height = Math.abs(point.y - corner.y);
+    if (width < 1 || height < 1) return;
+    onHotspotAdd?.({ id: crypto.randomUUID(), typologyId: targetId, x: Math.min(point.x, corner.x), y: Math.min(point.y, corner.y), width, height });
+    setDrawing(false);
+    setCorner(null);
     onSelect(targetId);
   }
 
@@ -44,15 +60,17 @@ export function FloorPlanInteractive({ floorPlan, typologies, selectedId, editab
         <div className="space-y-3 border-b border-ink/10 bg-paper p-4">
           <div className="flex flex-wrap items-end gap-3">
             <label className="min-w-48 flex-1">Tipología para la nueva zona
-              <select className="field" value={targetId} onChange={(event) => onSelect(event.target.value)} disabled={!typologies.length}>
+              <select className="field" value={targetId} onChange={(event) => onSelect(event.target.value)} disabled={!typologies.length || drawing}>
                 {typologies.map((item) => <option key={item.id} value={item.id}>{item.code}</option>)}
               </select>
             </label>
             <button className="primary-touch disabled:opacity-50" type="button" disabled={!targetId || !onHotspotAdd} onClick={addZone}>
               <Plus className="size-4" /> Agregar zona clicable
             </button>
+            {drawing && <button className="secondary-touch" type="button" onClick={() => { setDrawing(false); setCorner(null); }}>Cancelar marcado</button>}
           </div>
-          <p className="text-sm text-ink/70">Elige una tipología y agrega una zona. Ajusta su posición y tamaño con los controles debajo del plano. Los cambios se guardan automáticamente en este navegador.</p>
+          <p role="status">{drawing ? corner ? "Haz clic en la esquina opuesta (separada al menos 1% en cada dirección)." : "Haz clic en la primera esquina del área." : "Pulsa Agregar zona clicable y marca dos esquinas sobre el plano."}</p>
+          <p className="text-sm text-ink/70">Elige una tipología y agrega una zona. Marca el área con dos clics. Para afinarla, usa los botones − y + o escribe los porcentajes debajo del plano. Los cambios se guardan automáticamente en este navegador.</p>
           {!typologies.length && <p role="status">Primero agrega una tipología.</p>}
           {!floorPlan.hotspots.length && <p role="status">Todavía no hay zonas clicables.</p>}
         </div>
@@ -94,6 +112,11 @@ export function FloorPlanInteractive({ floorPlan, typologies, selectedId, editab
             </button>
           );
         })}
+        {editable && drawing && (
+          <button type="button" className="absolute inset-0 z-10 cursor-crosshair bg-transparent ring-2 ring-inset ring-morada" aria-label="Marcar esquina de la zona en el plano" onClick={markCorner} onKeyDown={(event) => { if (event.key === "Escape") { setDrawing(false); setCorner(null); } }}>
+            {corner && <span className="pointer-events-none absolute size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-morada" style={{ left: `${corner.x}%`, top: `${corner.y}%` }} />}
+          </button>
+        )}
       </div>
       {editable ? (
         <div className="grid gap-3 border-t border-ink/10 bg-paper p-4 md:grid-cols-2 xl:grid-cols-4">
@@ -108,11 +131,13 @@ export function FloorPlanInteractive({ floorPlan, typologies, selectedId, editab
                   </select>
                 </label>
                 {(["x", "y", "width", "height"] as const).map((field) => (
-                  <label className="mb-2 grid grid-cols-[70px_1fr_42px] items-center gap-2 text-xs" key={field}>
-                    <span>{{ x: "Horizontal", y: "Vertical", width: "Ancho", height: "Alto" }[field]}</span>
-                    <input type="range" min={field === "width" || field === "height" ? 1 : 0} max={field === "x" ? 100 - hotspot.width : field === "y" ? 100 - hotspot.height : 100} value={hotspot[field]} onChange={(event) => update(hotspot, { [field]: Number(event.target.value) })} />
-                    <span>{Math.round(hotspot[field])}%</span>
-                  </label>
+                  <div className="mb-2 flex flex-wrap items-center gap-1 text-xs" key={field}>
+                    <label className="w-[70px]" htmlFor={`${hotspot.id}-${field}`}>{{ x: "Horizontal", y: "Vertical", width: "Ancho", height: "Alto" }[field]}</label>
+                    <button type="button" className="h-9 w-9 rounded border border-ink/20" aria-label={`Reducir ${field} de ${typology?.code}`} onClick={() => update(hotspot, { [field]: hotspot[field] - 1 })}>−</button>
+                    <input id={`${hotspot.id}-${field}`} className="h-9 w-16 rounded border border-ink/20 px-1" type="number" step="0.1" min={field === "width" || field === "height" ? 1 : 0} max={field === "x" ? 100 - hotspot.width : field === "y" ? 100 - hotspot.height : 100} value={Number(hotspot[field].toFixed(1))} onChange={(event) => { if (event.target.value !== "") update(hotspot, { [field]: Number(event.target.value) }); }} />
+                    <span>%</span>
+                    <button type="button" className="h-9 w-9 rounded border border-ink/20" aria-label={`Aumentar ${field} de ${typology?.code}`} onClick={() => update(hotspot, { [field]: hotspot[field] + 1 })}>+</button>
+                  </div>
                 ))}
                 <button className="secondary-touch mt-2 w-full" type="button" onClick={() => onHotspotDelete?.(hotspot.id)} disabled={!onHotspotDelete} aria-label={`Eliminar zona ${typology?.code ?? "sin asignar"}`}>
                   <Trash2 className="size-4" /> Eliminar zona
