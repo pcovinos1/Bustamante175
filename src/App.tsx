@@ -822,7 +822,11 @@ function FloorPage({ project, selectedTypologyId, setSelectedTypologyId, onNavig
     <section className="page-wrap">
       <PageHeading eyebrow="Ubicación en planta" title={typology?.code ?? project.floorPlan.title} text="Ubicación referencial incluida en la ficha del departamento." />
       <div className="grid gap-6 lg:grid-cols-[1fr_330px]">
-        <PlanViewer src={typology?.floorThumbnailSrc ?? project.floorPlan.imageSrc} title={`Ubicación ${typology?.code ?? "en planta"}`} />
+        {project.floorPlan.hotspots.some((zone) => project.typologies.some((item) => item.id === zone.typologyId)) ? (
+          <FloorPlanInteractive floorPlan={project.floorPlan} typologies={project.typologies} selectedId={selectedTypologyId} onSelect={setSelectedTypologyId} />
+        ) : (
+          <PlanViewer src={typology?.floorThumbnailSrc ?? project.floorPlan.imageSrc} title={`Ubicación ${typology?.code ?? "en planta"}`} />
+        )}
         <aside className="rounded border border-ink/10 bg-porcelain p-5">
           {typology ? (
             <>
@@ -998,6 +1002,8 @@ function AdminPage({ project, updateProject, reload, syncFromRemote }: { project
               typologies={project.typologies}
               selectedId={selected}
               onSelect={setSelected}
+              onHotspotAdd={(hotspot) => updateProject((current) => ({ ...current, floorPlan: { ...current.floorPlan, updatedAt: new Date().toISOString(), hotspots: [...current.floorPlan.hotspots, hotspot] } }))}
+              onHotspotDelete={(id) => updateProject((current) => ({ ...current, floorPlan: { ...current.floorPlan, updatedAt: new Date().toISOString(), hotspots: current.floorPlan.hotspots.filter((item) => item.id !== id) } }))}
               onHotspotChange={(hotspot) => updateProject((current) => ({ ...current, floorPlan: { ...current.floorPlan, hotspots: current.floorPlan.hotspots.map((item) => item.id === hotspot.id ? hotspot : item) } }))}
             />
           </div>
