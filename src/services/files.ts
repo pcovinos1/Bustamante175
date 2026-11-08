@@ -71,6 +71,10 @@ async function optimizeProjectForJson(project: Project): Promise<Project> {
     typology.thumbnailSrc = await optimize(typology.thumbnailSrc, 1400);
     typology.floorThumbnailSrc = await optimize(typology.floorThumbnailSrc, 1800);
   }
+  for (const plan of cloned.generalPlans ?? []) {
+    plan.planSrc = await optimize(plan.planSrc, 3000);
+    plan.thumbnailSrc = await optimize(plan.thumbnailSrc, 1400);
+  }
   return cloned;
 }
 
@@ -134,6 +138,7 @@ function collectAssetSources(project: Project): string[] {
     sources.add(typology.thumbnailSrc);
     sources.add(typology.floorThumbnailSrc);
   });
+  project.generalPlans?.forEach(plan => { sources.add(plan.planSrc); sources.add(plan.thumbnailSrc); });
   return [...sources].filter(Boolean);
 }
 

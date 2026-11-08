@@ -138,7 +138,16 @@ export interface AboutContent {
   projects: AboutProject[];
 }
 
+export interface GeneralPlan {
+  id: string;
+  title: string;
+  planSrc: string;
+  thumbnailSrc: string;
+  updatedAt: string;
+}
+
 export interface Project {
+  generalPlans?: GeneralPlan[];
   plansRevision?: string;
   id: string;
   name: string;

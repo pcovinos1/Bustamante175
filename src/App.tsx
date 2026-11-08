@@ -764,6 +764,8 @@ function ParallaxStory({ eyebrow, title, text, gallery, labels, onOpenGallery }:
 function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, onNavigate, onOpenVirtualTour }: { project: Project; selectedTypologyId: string; setSelectedTypologyId: (id: string) => void; onNavigate: (view: ViewKey) => void; onOpenVirtualTour: () => void }) {
   const [bedrooms, setBedrooms] = useState("Todos");
   const [area, setArea] = useState("Todas");
+  const [generalPlanId, setGeneralPlanId] = useState("");
+  const generalPlan = project.generalPlans?.find(plan => plan.id === generalPlanId);
   const typologies = project.typologies.filter((item) => item.active);
   const filtered = typologies.filter((item) => (bedrooms === "Todos" || item.bedrooms === Number(bedrooms)) && (area === "Todas" || (area === "<60" ? item.areaM2 < 60 : area === "60-65" ? item.areaM2 >= 60 && item.areaM2 <= 65 : item.areaM2 > 65)));
   return (
@@ -812,6 +814,29 @@ function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, o
           </article>
         ))}
       </div>
+      {!!project.generalPlans?.length && (
+        <div className="mt-10">
+          <h2 className="mb-4 font-display text-4xl">Planos generales</h2>
+          <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-5">
+            {project.generalPlans.map(plan => (
+              <button key={plan.id} type="button" className="rounded border border-ink/10 bg-porcelain p-4 text-left" onClick={() => setGeneralPlanId(plan.id)}>
+                <img src={plan.thumbnailSrc} alt={`Plano de ${plan.title}`} className="h-40 w-full bg-white object-contain" loading="lazy" />
+                <span className="mt-3 block text-xl">{plan.title}</span>
+                <span className="text-morada">Ver plano</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {generalPlan && (
+        <div className="fixed inset-0 z-[100] overflow-auto bg-porcelain p-4 md:p-8" role="dialog" aria-modal="true" aria-label={generalPlan.title} onKeyDown={event => { if (event.key === "Escape") setGeneralPlanId(""); }}>
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <h2 className="font-display text-4xl">{generalPlan.title}</h2>
+            <button autoFocus type="button" className="secondary-touch" onClick={() => setGeneralPlanId("")}>Cerrar plano</button>
+          </div>
+          <PlanViewer key={generalPlan.id} src={generalPlan.planSrc} title={generalPlan.title} />
+        </div>
+      )}
     </section>
   );
 }
