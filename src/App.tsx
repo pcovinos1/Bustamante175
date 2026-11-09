@@ -1,5 +1,5 @@
-import { ArrowRight, ArrowUp, ArrowDown, Building2, Check, ChevronLeft, ChevronRight, Download, FileUp, Grid3X3, Lock, Plus, RotateCcw, Save, Search, Trash2, Upload, View, X } from "lucide-react";
-import type { PointerEvent, ReactNode } from "react";
+import { ArrowRight, ArrowUp, ArrowDown, Building2, Check, ChevronLeft, ChevronRight, Download, FileUp, Grid3X3, Lock, Plus, RotateCcw, Save, Search, Trash2, Upload } from "lucide-react";
+import type { ReactNode } from "react";
 import { useRef, useState } from "react";
 import { FloorPlanInteractive } from "./components/FloorPlanInteractive";
 import { GalleryModal } from "./components/GalleryModal";
@@ -27,7 +27,6 @@ export default function App() {
   const [selectedTypologyId, setSelectedTypologyId] = useState("a-1");
   const [gallery, setGallery] = useState<{ images: GalleryImage[]; index: number } | null>(null);
   const [poiFilter, setPoiFilter] = useState("Todos");
-  const [virtualTourOpen, setVirtualTourOpen] = useState(false);
 
   const selectedTypology = project?.typologies.find((item) => item.id === selectedTypologyId) ?? project?.typologies[0];
   const navigate = (next: ViewKey) => {
@@ -50,7 +49,7 @@ export default function App() {
       {view === "amenities" && <AmenitiesPage project={project} onOpenGallery={setGallery} />}
       {view === "interiors" && <InteriorsPage project={project} onOpenGallery={setGallery} />}
       {view === "location" && <LocationPage project={project} filter={poiFilter} setFilter={setPoiFilter} onOpenGallery={setGallery} />}
-      {view === "departments" && <DepartmentsPage project={project} selectedTypologyId={selectedTypologyId} setSelectedTypologyId={setSelectedTypologyId} onNavigate={navigate} onOpenVirtualTour={() => setVirtualTourOpen(true)} />}
+      {view === "departments" && <DepartmentsPage project={project} selectedTypologyId={selectedTypologyId} setSelectedTypologyId={setSelectedTypologyId} onNavigate={navigate} />}
       {view === "floor" && (
         <FloorPage
           project={project}
@@ -66,188 +65,7 @@ export default function App() {
       {view === "contact" && <ContactPage project={project} />}
       {view === "admin" && <AdminPage project={project} updateProject={updateProject} reload={reload} syncFromRemote={syncFromRemote} />}
       {gallery ? <GalleryModal images={gallery.images} initialIndex={gallery.index} onClose={() => setGallery(null)} /> : null}
-      {virtualTourOpen ? <VirtualTourModal project={project} onClose={() => setVirtualTourOpen(false)} /> : null}
     </main>
-  );
-}
-
-type VirtualTourScene = {
-  id: string;
-  title: string;
-  eyebrow: string;
-  imageSrc: string;
-  initialRotation: number;
-  hotspots: Array<{
-    id: string;
-    label: string;
-    targetId: string;
-    x: number;
-    y: number;
-  }>;
-};
-
-function VirtualTourModal({ project, onClose }: { project: Project; onClose: () => void }) {
-  const fachada = project.galleries.find((item) => item.id === "fachada")?.images[0]?.src ?? project.galleries[0]?.images[0]?.src;
-  const lobby = project.galleries.find((item) => item.id === "proyecto-fachada")?.images[1]?.src ?? fachada;
-  const sala = project.galleries.find((item) => item.id === "interiores")?.images[0]?.src ?? fachada;
-  const dormitorio = project.galleries.find((item) => item.id === "interiores")?.images[1]?.src ?? sala;
-  const terraza = project.galleries.find((item) => item.id === "areas")?.images[0]?.src ?? fachada;
-
-  const scenes: VirtualTourScene[] = [
-    {
-      id: "fachada",
-      title: "Fachada",
-      eyebrow: "Ingreso principal",
-      imageSrc: fachada,
-      initialRotation: 48,
-      hotspots: [
-        { id: "fachada-lobby", label: "Entrar al lobby", targetId: "lobby", x: 50, y: 58 },
-        { id: "fachada-terraza", label: "Ver áreas comunes", targetId: "terraza", x: 72, y: 38 }
-      ]
-    },
-    {
-      id: "lobby",
-      title: "Lobby",
-      eyebrow: "Recepción",
-      imageSrc: lobby,
-      initialRotation: 42,
-      hotspots: [
-        { id: "lobby-sala", label: "Ir al departamento modelo", targetId: "sala", x: 62, y: 54 },
-        { id: "lobby-fachada", label: "Volver a fachada", targetId: "fachada", x: 22, y: 64 }
-      ]
-    },
-    {
-      id: "sala",
-      title: "Sala comedor",
-      eyebrow: "Departamento modelo",
-      imageSrc: sala,
-      initialRotation: 36,
-      hotspots: [
-        { id: "sala-dormitorio", label: "Ver dormitorio", targetId: "dormitorio", x: 76, y: 50 },
-        { id: "sala-lobby", label: "Volver al lobby", targetId: "lobby", x: 20, y: 58 }
-      ]
-    },
-    {
-      id: "dormitorio",
-      title: "Dormitorio",
-      eyebrow: "Ambiente privado",
-      imageSrc: dormitorio,
-      initialRotation: 58,
-      hotspots: [
-        { id: "dormitorio-sala", label: "Volver a sala", targetId: "sala", x: 18, y: 62 },
-        { id: "dormitorio-terraza", label: "Ver terraza común", targetId: "terraza", x: 68, y: 44 }
-      ]
-    },
-    {
-      id: "terraza",
-      title: "Áreas comunes",
-      eyebrow: "Amenities",
-      imageSrc: terraza,
-      initialRotation: 50,
-      hotspots: [
-        { id: "terraza-sala", label: "Ver departamento modelo", targetId: "sala", x: 28, y: 58 },
-        { id: "terraza-fachada", label: "Salir a fachada", targetId: "fachada", x: 72, y: 60 }
-      ]
-    }
-  ];
-
-  const [activeSceneId, setActiveSceneId] = useState(scenes[0].id);
-  const activeScene = scenes.find((scene) => scene.id === activeSceneId) ?? scenes[0];
-  const [rotation, setRotation] = useState(activeScene.initialRotation);
-  const [dragStart, setDragStart] = useState<{ x: number; rotation: number } | null>(null);
-
-  const moveToScene = (sceneId: string) => {
-    const next = scenes.find((scene) => scene.id === sceneId) ?? scenes[0];
-    setActiveSceneId(next.id);
-    setRotation(next.initialRotation);
-    setDragStart(null);
-  };
-
-  const rotate = (delta: number) => setRotation((current) => (current + delta + 100) % 100);
-  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    event.currentTarget.setPointerCapture(event.pointerId);
-    setDragStart({ x: event.clientX, rotation });
-  };
-  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    if (!dragStart) return;
-    const delta = (dragStart.x - event.clientX) / 8;
-    setRotation((dragStart.rotation + delta + 100) % 100);
-  };
-  const handlePointerUp = (event: PointerEvent<HTMLDivElement>) => {
-    event.currentTarget.releasePointerCapture(event.pointerId);
-    setDragStart(null);
-  };
-
-  return (
-    <div className="virtual-tour-overlay" role="dialog" aria-modal="true" aria-label="Recorrido virtual">
-      <button className="virtual-tour-backdrop" onClick={onClose} type="button" aria-label="Cerrar recorrido virtual" />
-      <section className="virtual-tour-panel">
-        <header>
-          <div>
-            <p className="eyebrow">Departamentos</p>
-            <h2>Tour 360</h2>
-          </div>
-          <div className="flex gap-2">
-            <button className="virtual-tour-close" onClick={onClose} type="button" aria-label="Cerrar">
-              <X className="size-5" />
-            </button>
-          </div>
-        </header>
-        <div className="virtual-tour-body">
-          <aside className="virtual-tour-scenes" aria-label="Ambientes del recorrido">
-            {scenes.map((scene) => (
-              <button
-                key={scene.id}
-                className={activeScene.id === scene.id ? "is-active" : ""}
-                onClick={() => moveToScene(scene.id)}
-                type="button"
-              >
-                <span>{scene.eyebrow}</span>
-                <strong>{scene.title}</strong>
-              </button>
-            ))}
-          </aside>
-          <div
-            className="virtual-tour-frame"
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerUp}
-            style={{ backgroundImage: `url(${activeScene.imageSrc})`, backgroundPosition: `${rotation}% center` }}
-            role="img"
-            aria-label={`${activeScene.title} en tour 360`}
-          >
-            <div className="virtual-tour-shade" />
-            <div className="virtual-tour-info">
-              <span>{activeScene.eyebrow}</span>
-              <strong>{activeScene.title}</strong>
-            </div>
-            <div className="virtual-tour-controls" aria-label="Controles de giro">
-              <button onClick={() => rotate(-8)} type="button" aria-label="Girar a la izquierda">
-                <ChevronLeft className="size-5" />
-              </button>
-              <button onClick={() => setRotation(activeScene.initialRotation)} type="button" aria-label="Centrar vista">
-                <RotateCcw className="size-5" />
-              </button>
-              <button onClick={() => rotate(8)} type="button" aria-label="Girar a la derecha">
-                <ChevronRight className="size-5" />
-              </button>
-            </div>
-            {activeScene.hotspots.map((hotspot) => (
-              <button
-                key={hotspot.id}
-                className="virtual-tour-hotspot"
-                onClick={() => moveToScene(hotspot.targetId)}
-                style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%` }}
-                type="button"
-              >
-                <span>{hotspot.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-    </div>
   );
 }
 
@@ -761,7 +579,7 @@ function ParallaxStory({ eyebrow, title, text, gallery, labels, onOpenGallery }:
   );
 }
 
-function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, onNavigate, onOpenVirtualTour }: { project: Project; selectedTypologyId: string; setSelectedTypologyId: (id: string) => void; onNavigate: (view: ViewKey) => void; onOpenVirtualTour: () => void }) {
+function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, onNavigate }: { project: Project; selectedTypologyId: string; setSelectedTypologyId: (id: string) => void; onNavigate: (view: ViewKey) => void }) {
   const [bedrooms, setBedrooms] = useState("Todos");
   const [area, setArea] = useState("Todas");
   const [generalPlanId, setGeneralPlanId] = useState("");
@@ -784,9 +602,6 @@ function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, o
         ))}
         <button className="primary-touch ml-auto" onClick={() => onNavigate("floor")} type="button">
           Ver ubicación en planta <Grid3X3 />
-        </button>
-        <button className="secondary-touch" onClick={onOpenVirtualTour} type="button">
-          Recorrido virtual <View className="size-5" />
         </button>
         <button className="secondary-touch" onClick={() => onNavigate("compare")} type="button">
           Comparar <Search />
