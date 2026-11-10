@@ -1,6 +1,6 @@
-import { ArrowRight, ArrowUp, ArrowDown, Building2, Check, ChevronLeft, ChevronRight, Download, FileUp, Grid3X3, Lock, Plus, RotateCcw, Save, Search, Trash2, Upload } from "lucide-react";
+import { ArrowRight, ArrowUp, ArrowDown, Building2, Check, ChevronLeft, ChevronRight, Download, FileUp, Grid3X3, Lock, Plus, RotateCcw, Save, Search, Trash2, Upload, X } from "lucide-react";
 import type { ReactNode } from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FloorPlanInteractive } from "./components/FloorPlanInteractive";
 import { GalleryModal } from "./components/GalleryModal";
 import { GlobalNav } from "./components/GlobalNav";
@@ -25,6 +25,7 @@ export default function App() {
   const { project, loading, updateProject, reload, syncFromRemote } = useProject();
   const [view, setView] = useState<ViewKey>("home");
   const [selectedTypologyId, setSelectedTypologyId] = useState("a-1");
+  const [planTypologyIds, setPlanTypologyIds] = useState<string[] | null>(null);
   const [gallery, setGallery] = useState<{ images: GalleryImage[]; index: number } | null>(null);
   const [poiFilter, setPoiFilter] = useState("Todos");
 
@@ -32,6 +33,10 @@ export default function App() {
   const navigate = (next: ViewKey) => {
     if (next === "location") setPoiFilter("Todos");
     setView(next);
+  };
+  const openTypology = (id: string, ids: string[]) => {
+    setSelectedTypologyId(id);
+    setPlanTypologyIds(ids);
   };
 
   if (loading || !project) {
@@ -49,17 +54,26 @@ export default function App() {
       {view === "amenities" && <AmenitiesPage project={project} onOpenGallery={setGallery} />}
       {view === "interiors" && <InteriorsPage project={project} onOpenGallery={setGallery} />}
       {view === "location" && <LocationPage project={project} filter={poiFilter} setFilter={setPoiFilter} onOpenGallery={setGallery} />}
-      {view === "departments" && <DepartmentsPage project={project} selectedTypologyId={selectedTypologyId} setSelectedTypologyId={setSelectedTypologyId} onNavigate={navigate} />}
+      {view === "departments" && <DepartmentsPage project={project} selectedTypologyId={selectedTypologyId} setSelectedTypologyId={setSelectedTypologyId} onNavigate={navigate} onOpenTypology={openTypology} />}
       {view === "floor" && (
         <FloorPage
           project={project}
           selectedTypologyId={selectedTypologyId}
           setSelectedTypologyId={setSelectedTypologyId}
-          onNavigate={navigate}
+          onOpenTypology={openTypology}
         />
       )}
-      {view === "typology" && selectedTypology && (
-        <TypologyPage project={project} typology={selectedTypology} setSelectedTypologyId={setSelectedTypologyId} onNavigate={navigate} />
+      {planTypologyIds && selectedTypology && (
+        <TypologyDialog
+          typology={selectedTypology}
+          typologyIds={planTypologyIds}
+          setSelectedTypologyId={setSelectedTypologyId}
+          onClose={() => setPlanTypologyIds(null)}
+          onShowFloor={() => {
+            setPlanTypologyIds(null);
+            navigate("floor");
+          }}
+        />
       )}
       {view === "compare" && <ComparePage project={project} />}
       {view === "contact" && <ContactPage project={project} />}
@@ -579,7 +593,7 @@ function ParallaxStory({ eyebrow, title, text, gallery, labels, onOpenGallery }:
   );
 }
 
-function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, onNavigate }: { project: Project; selectedTypologyId: string; setSelectedTypologyId: (id: string) => void; onNavigate: (view: ViewKey) => void }) {
+function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, onNavigate, onOpenTypology }: { project: Project; selectedTypologyId: string; setSelectedTypologyId: (id: string) => void; onNavigate: (view: ViewKey) => void; onOpenTypology: (id: string, ids: string[]) => void }) {
   const [bedrooms, setBedrooms] = useState("Todos");
   const [area, setArea] = useState("Todas");
   const [generalPlanId, setGeneralPlanId] = useState("");
@@ -609,20 +623,26 @@ function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, o
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {filtered.map((typology) => (
-          <article key={typology.id} className={`rounded border bg-porcelain p-4 ${selectedTypologyId === typology.id ? "border-morada" : "border-ink/10"}`}>
+          <article key={typology.id} className={`relative rounded border bg-porcelain p-4 transition hover:border-morada ${selectedTypologyId === typology.id ? "border-morada" : "border-ink/10"}`}>
             <img className="h-44 w-full rounded border border-ink/10 bg-white object-contain" src={typology.thumbnailSrc} alt={`Plano ${typology.code}`} />
-          <div className="mt-4 flex items-start justify-between">
-            <div>
-              <h2 className="font-display text-4xl">{typology.code}</h2>
-              <p className="text-ink/70">Plano en alta resolución</p>
+            <div className="mt-4 flex items-start justify-between">
+              <div>
+                <h2 className="font-display text-4xl">{typology.code}</h2>
+                <p className="text-ink/70">Plano en alta resolución</p>
+              </div>
+              <span className="rounded-full bg-morada/10 px-3 py-1 text-sm text-morada">{typology.format}</span>
             </div>
-            <span className="rounded-full bg-morada/10 px-3 py-1 text-sm text-morada">{typology.format}</span>
-          </div>
             <div className="mt-4 flex gap-2">
-              <button className="primary-touch flex-1" onClick={() => { setSelectedTypologyId(typology.id); onNavigate("typology"); }} type="button">
+              <button
+                className="primary-touch flex-1 after:absolute after:inset-0 after:rounded after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-morada active:transform-none"
+                onClick={() => onOpenTypology(typology.id, filtered.map((item) => item.id))}
+                type="button"
+                aria-label={`Ver plano de ${typology.code}`}
+                aria-haspopup="dialog"
+              >
                 Ver plano
               </button>
-              <button className="secondary-touch flex-1" onClick={() => { setSelectedTypologyId(typology.id); onNavigate("floor"); }} type="button">
+              <button className="secondary-touch relative z-10 flex-1" onClick={() => { setSelectedTypologyId(typology.id); onNavigate("floor"); }} type="button">
                 En planta
               </button>
             </div>
@@ -656,7 +676,7 @@ function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, o
   );
 }
 
-function FloorPage({ project, selectedTypologyId, setSelectedTypologyId, onNavigate }: { project: Project; selectedTypologyId: string; setSelectedTypologyId: (id: string) => void; onNavigate: (view: ViewKey) => void }) {
+function FloorPage({ project, selectedTypologyId, setSelectedTypologyId, onOpenTypology }: { project: Project; selectedTypologyId: string; setSelectedTypologyId: (id: string) => void; onOpenTypology: (id: string, ids: string[]) => void }) {
   const typology = project.typologies.find((item) => item.id === selectedTypologyId);
   return (
     <section className="page-wrap">
@@ -674,7 +694,7 @@ function FloorPage({ project, selectedTypologyId, setSelectedTypologyId, onNavig
               <h2 className="mt-3 font-display text-6xl">{typology.code}</h2>
               <p className="mt-2 text-xl">Ubicación del departamento</p>
               <img className="mt-5 h-48 w-full rounded bg-white object-contain" src={typology.thumbnailSrc} alt={`Miniatura ${typology.code}`} />
-              <button className="primary-touch mt-6 w-full" onClick={() => onNavigate("typology")} type="button">
+              <button className="primary-touch mt-6 w-full" onClick={() => onOpenTypology(typology.id, project.typologies.filter((item) => item.active || item.id === typology.id).map((item) => item.id))} type="button" aria-haspopup="dialog">
                 Ver plano <ArrowRight />
               </button>
             </>
@@ -685,27 +705,38 @@ function FloorPage({ project, selectedTypologyId, setSelectedTypologyId, onNavig
   );
 }
 
-function TypologyPage({ project, typology, setSelectedTypologyId, onNavigate }: { project: Project; typology: Typology; setSelectedTypologyId: (id: string) => void; onNavigate: (view: ViewKey) => void }) {
-  const active = project.typologies.filter((item) => item.active);
-  const index = active.findIndex((item) => item.id === typology.id);
+function TypologyDialog({ typology, typologyIds, setSelectedTypologyId, onClose, onShowFloor }: { typology: Typology; typologyIds: string[]; setSelectedTypologyId: (id: string) => void; onClose: () => void; onShowFloor: () => void }) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    dialog?.showModal();
+    return () => dialog?.close();
+  }, []);
+
+  const index = typologyIds.indexOf(typology.id);
   const move = (direction: number) => {
-    const next = active[(index + direction + active.length) % active.length];
-    setSelectedTypologyId(next.id);
+    setSelectedTypologyId(typologyIds[(index + direction + typologyIds.length) % typologyIds.length]);
   };
   return (
-    <section className="page-wrap">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <PageHeading eyebrow="Detalle de tipología" title={`Tipología ${typology.code}`} text="La imagen del plano contiene la información técnica vigente." />
-        <div className="flex gap-2">
-          <button className="secondary-touch" onClick={() => move(-1)} type="button"><ChevronLeft /> Anterior</button>
-          <button className="secondary-touch" onClick={() => move(1)} type="button">Siguiente <ChevronRight /></button>
-          <button className="primary-touch" onClick={() => onNavigate("floor")} type="button">Regresar a planta</button>
-        </div>
+    <dialog
+      ref={dialogRef}
+      className="typology-dialog fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none overflow-hidden bg-paper text-ink"
+      aria-labelledby="typology-plan-title"
+      onCancel={(event) => { event.preventDefault(); onClose(); }}
+    >
+      <div className="grid h-full grid-rows-[auto_minmax(0,1fr)] gap-1 p-1 sm:gap-2 sm:p-2">
+        <header className="flex flex-wrap items-center justify-between gap-x-3 px-2">
+          <h1 id="typology-plan-title" className="font-display text-xl sm:text-2xl">{typology.code}</h1>
+          <div className="flex items-center gap-1">
+            <button className="icon-button disabled:opacity-40" disabled={typologyIds.length < 2} onClick={() => move(-1)} type="button" aria-label="Tipología anterior"><ChevronLeft className="size-5" /></button>
+            <button className="icon-button disabled:opacity-40" disabled={typologyIds.length < 2} onClick={() => move(1)} type="button" aria-label="Siguiente tipología"><ChevronRight className="size-5" /></button>
+            <button className="icon-button px-2 text-sm" onClick={onShowFloor} type="button">En planta</button>
+            <button autoFocus className="icon-button" onClick={onClose} type="button" aria-label="Cerrar plano"><X className="size-5" /></button>
+          </div>
+        </header>
+        <PlanViewer key={typology.id} src={typology.planSrc} title={`Plano ${typology.code}`} fitViewport />
       </div>
-      <div className="grid gap-6">
-        <PlanViewer src={typology.planSrc} title={`Plano ${typology.code}`} />
-      </div>
-    </section>
+    </dialog>
   );
 }
 

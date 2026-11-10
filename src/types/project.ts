@@ -9,7 +9,6 @@ export type ViewKey =
   | "interiors"
   | "departments"
   | "floor"
-  | "typology"
   | "compare"
   | "contact"
   | "admin";

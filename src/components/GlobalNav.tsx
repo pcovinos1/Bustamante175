@@ -22,7 +22,7 @@ export function GlobalNav({ current, onNavigate }: Props) {
     <nav className="fixed bottom-4 left-1/2 z-40 flex w-[calc(100%-1.5rem)] max-w-6xl -translate-x-1/2 items-center justify-between gap-1 rounded-full border border-ink/10 bg-paper/90 p-2 shadow-soft backdrop-blur-xl">
       {items.map((item) => {
         const Icon = item.icon;
-        const active = current === item.view || (item.view === "departments" && ["floor", "typology", "compare"].includes(current));
+        const active = current === item.view || (item.view === "departments" && ["floor", "compare"].includes(current));
         return (
           <button
             key={item.view}
