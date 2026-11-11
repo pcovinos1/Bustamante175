@@ -1,8 +1,9 @@
 import JSZip from "jszip";
 import type { Project } from "../types/project";
+import { migrateLocation } from "../data/locationContent";
 import { migratePlans } from "../data/migratePlans";
 
-export function fileToDataUrl(file: File): Promise<string> {
+export function fileToDataUrl(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
@@ -24,12 +25,13 @@ export function formatBytes(bytes: number): string {
 
 export async function exportProjectZip(project: Project): Promise<void> {
   const zip = new JSZip();
-  zip.file("bustamante-175-project.json", serializeProject(project));
+  const portable = await embedLocationAssets(project);
+  zip.file("bustamante-175-project.json", serializeProject(portable));
   zip.file(
     "README.txt",
     `${project.name} Morada\nVersion: ${project.version.version}\nPublicado: ${project.version.publishedAt}\n\nImporta este ZIP desde el panel administrador de la app.`
   );
-  const assets = collectAssetSources(project);
+  const assets = collectAssetSources(portable);
   await Promise.all(
     assets.map(async (src, index) => {
       try {
@@ -46,9 +48,35 @@ export async function exportProjectZip(project: Project): Promise<void> {
 }
 
 export async function exportProjectJson(project: Project): Promise<void> {
-  const optimizedProject = await optimizeProjectForJson(project);
+  const optimizedProject = await optimizeProjectForJson(await embedLocationAssets(project));
   const blob = new Blob([serializeProject(optimizedProject)], { type: "application/json" });
   downloadBlob(blob, "project.json");
+}
+
+// Bundle location images so exports also work in an installation with a different build path.
+async function embedLocationAssets(project: Project): Promise<Project> {
+  const { location } = project;
+  if (!location) return project;
+  const reads = new Map<string, Promise<string>>();
+  function embed(src: string): Promise<string> {
+    if (!src || src.startsWith("data:")) return Promise.resolve(src);
+    const url = new URL(src, window.location.href);
+    if (url.origin !== window.location.origin) return Promise.resolve(src);
+    const cached = reads.get(src);
+    if (cached) return cached;
+    const pending = fetch(url).then(async (response) => {
+      if (!response.ok) throw new Error("No se pudo incluir una imagen de Ubicación en la exportación.");
+      return fileToDataUrl(await response.blob());
+    });
+    reads.set(src, pending);
+    return pending;
+  }
+  const [imageSrc, images, pointsOfInterest] = await Promise.all([
+    embed(location.map.imageSrc),
+    Promise.all(location.storytelling.images.map(async (image) => ({ ...image, src: await embed(image.src) }))),
+    Promise.all(project.pointsOfInterest.map(async (point) => point.photoSrc ? { ...point, photoSrc: await embed(point.photoSrc) } : point))
+  ]);
+  return { ...project, location: { ...location, map: { ...location.map, imageSrc }, storytelling: { ...location.storytelling, images } }, pointsOfInterest };
 }
 
 async function optimizeProjectForJson(project: Project): Promise<Project> {
@@ -65,6 +93,13 @@ async function optimizeProjectForJson(project: Project): Promise<Project> {
     for (const image of gallery.images) {
       image.src = await optimize(image.src, gallery.id === "barrio" ? 2600 : 2200);
     }
+  }
+  if (cloned.location) {
+    for (const image of cloned.location.storytelling.images) image.src = await optimize(image.src);
+    cloned.location.map.imageSrc = await optimize(cloned.location.map.imageSrc, 2800);
+  }
+  for (const point of cloned.pointsOfInterest) {
+    if (point.photoSrc) point.photoSrc = await optimize(point.photoSrc, 1400);
   }
   for (const typology of cloned.typologies) {
     typology.planSrc = await optimize(typology.planSrc, 2600);
@@ -139,6 +174,12 @@ function collectAssetSources(project: Project): string[] {
     sources.add(typology.floorThumbnailSrc);
   });
   project.generalPlans?.forEach(plan => { sources.add(plan.planSrc); sources.add(plan.thumbnailSrc); });
+  if (project.location) {
+    sources.add(project.location.map.imageSrc);
+    project.location.storytelling.images.forEach((image) => sources.add(image.src));
+  }
+  project.pointsOfInterest?.forEach((point) => { if (point.photoSrc) sources.add(point.photoSrc); });
+  project.location?.archivedPoints?.forEach((point) => { if (point.photoSrc) sources.add(point.photoSrc); });
   return [...sources].filter(Boolean);
 }
 
@@ -210,7 +251,7 @@ export async function fetchRemoteProject(current?: Project): Promise<Project | n
     throw new Error("El contenido publicado en GitHub no tiene un formato válido.");
   }
   if (current && compareProjectVersions(parsed, current) <= 0) return null;
-  return migratePlans(parsed);
+  return migrateLocation(migratePlans(parsed));
 }
 
 function compareVersionStrings(a: string, b: string): number {

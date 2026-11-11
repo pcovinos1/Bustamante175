@@ -6,6 +6,7 @@ import { GalleryModal } from "./components/GalleryModal";
 import { GlobalNav } from "./components/GlobalNav";
 import { PlanViewer } from "./components/PlanViewer";
 import { useProject } from "./context/ProjectContext";
+import { LocationPage } from "./components/location/LocationPage";
 import { AdminPage } from "./components/AdminPage";
 import type { Gallery, GalleryImage, Project, Typology, ViewKey } from "./types/project";
 
@@ -24,15 +25,15 @@ export default function App() {
   const { project, loading } = useProject();
   const [view, setView] = useState<ViewKey>("home");
   const [preview, setPreview] = useState<ViewKey | null>(null);
+  const [locationScreen, setLocationScreen] = useState<"story" | "map">("story");
   const visibleView = preview ?? view;
   const [selectedTypologyId, setSelectedTypologyId] = useState("a-1");
   const [planTypologyIds, setPlanTypologyIds] = useState<string[] | null>(null);
   const [gallery, setGallery] = useState<{ images: GalleryImage[]; index: number } | null>(null);
-  const [poiFilter, setPoiFilter] = useState("Todos");
 
   const selectedTypology = project?.typologies.find((item) => item.id === selectedTypologyId) ?? project?.typologies[0];
   const navigate = (next: ViewKey) => {
-    if (next === "location") setPoiFilter("Todos");
+    if (next === "location") setLocationScreen("story");
     if (preview) {
       setPreview(next === "admin" ? null : next);
     } else {
@@ -52,11 +53,11 @@ export default function App() {
     <>
       {view === "admin" && (
         <div hidden={Boolean(preview)}>
-          <AdminPage project={project} onExit={() => navigate("home")} onPreview={setPreview} />
+          <AdminPage project={project} onExit={() => navigate("home")} onPreview={(next, screen = "story") => { setLocationScreen(screen); setPreview(next); }} />
         </div>
       )}
       {visibleView !== "admin" && (
-        <main className="min-h-screen bg-paper pb-28 text-ink">
+        <main className={visibleView === "location" ? "bg-paper text-ink" : "min-h-screen bg-paper pb-28 text-ink"}>
           {preview && (
             <button className="admin-preview-return" type="button" onClick={() => {
               setGallery(null);
@@ -72,7 +73,7 @@ export default function App() {
           {visibleView === "architecture" && <ArchitecturePage project={project} onOpenGallery={setGallery} />}
           {visibleView === "amenities" && <AmenitiesPage project={project} onOpenGallery={setGallery} />}
           {visibleView === "interiors" && <InteriorsPage project={project} onOpenGallery={setGallery} />}
-          {visibleView === "location" && <LocationPage project={project} filter={poiFilter} setFilter={setPoiFilter} onOpenGallery={setGallery} />}
+          {visibleView === "location" && <LocationPage key={locationScreen} project={project} initialScreen={locationScreen} />}
           {visibleView === "departments" && <DepartmentsPage project={project} selectedTypologyId={selectedTypologyId} setSelectedTypologyId={setSelectedTypologyId} onNavigate={navigate} onOpenTypology={openTypology} />}
           {visibleView === "floor" && (
             <FloorPage
@@ -366,100 +367,6 @@ function InteriorsPage({ project, onOpenGallery }: { project: Project; onOpenGal
   const section = getSection(project, "interiors");
   return (
     <HorizontalGalleryStory eyebrow={section.title} title={gallery?.title ?? section.title} text={section.summary} gallery={gallery} labels={gallery?.images.map((image) => image.title) ?? ["Sala", "Comedor", "Cocina", "Dormitorio principal", "Dormitorio secundario", "Baño", "Detalles de materiales"]} onOpenGallery={onOpenGallery} />
-  );
-}
-
-function LocationPage({ project, filter, setFilter, onOpenGallery }: { project: Project; filter: string; setFilter: (value: string) => void; onOpenGallery: (value: { images: GalleryImage[]; index: number }) => void }) {
-  const [hoveredPoiId, setHoveredPoiId] = useState<string | null>(null);
-  const [selectedPoiId, setSelectedPoiId] = useState<string | null>(null);
-  const categories = ["Todos", "Gastronomía", "Parques", "Educación", "Tiendas"];
-  const gallery = project.galleries.find((item) => item.id === "barrio");
-  const visible = project.pointsOfInterest
-    .filter((poi) => poi.visible)
-    .filter((poi) => filter === "Todos" || poi.category === filter)
-    .sort((a, b) => a.order - b.order);
-  const section = getSection(project, "location");
-  const activePoiId = hoveredPoiId ?? selectedPoiId;
-  const activePoi = visible.find((poi) => poi.id === activePoiId);
-  return (
-    <section className="editorial-page">
-      <div className="location-scene">
-        <aside className="location-copy">
-          <p className="eyebrow">{section.title}</p>
-          <h1 className="editorial-title">{project.address}</h1>
-          <p className="editorial-lead">{section.summary}</p>
-          <div className="location-filters">
-            {categories.map((category) => (
-              <button key={category} className={`pill ${filter === category ? "pill-active" : ""}`} onClick={() => { setFilter(category); setHoveredPoiId(null); setSelectedPoiId(null); }} type="button">
-                {category}
-              </button>
-            ))}
-          </div>
-        </aside>
-        <div className="location-map" aria-label="Mapa interactivo de puntos de interés">
-          <div className="location-map-frame">
-            <img className="h-full w-full object-contain" src={gallery?.images[0]?.src} alt="Mapa ilustrado offline" />
-            {visible.map((poi) => {
-              const active = activePoiId === poi.id;
-              return (
-                <button
-                  key={poi.id}
-                  className={`location-marker ${active ? "is-active" : ""}`}
-                  style={{ left: `${poi.x}%`, top: `${poi.y}%` }}
-                  onMouseEnter={() => setHoveredPoiId(poi.id)}
-                  onMouseLeave={() => setHoveredPoiId(null)}
-                  onFocus={() => setHoveredPoiId(poi.id)}
-                  onBlur={() => setHoveredPoiId(null)}
-                  onClick={() => setSelectedPoiId((current) => (current === poi.id ? null : poi.id))}
-                  type="button"
-                  aria-label={poi.name}
-                >
-                  <span>{poi.order}</span>
-                  <em>{poi.name}</em>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        <aside className="location-list">
-          <div className="location-list-head">
-            <div>
-              <p className="eyebrow mb-1">Puntos de interés</p>
-              <span>{visible.length} lugares visibles</span>
-            </div>
-            {activePoi ? <strong>{activePoi.order}</strong> : null}
-          </div>
-          {activePoi ? <p className="location-active-name">{activePoi.name}</p> : null}
-          <div className="location-list-scroll">
-            {visible.map((poi) => {
-              const active = activePoiId === poi.id;
-              return (
-                <button
-                  key={poi.id}
-                  className={active ? "is-active" : ""}
-                  onMouseEnter={() => setHoveredPoiId(poi.id)}
-                  onMouseLeave={() => setHoveredPoiId(null)}
-                  onFocus={() => setHoveredPoiId(poi.id)}
-                  onBlur={() => setHoveredPoiId(null)}
-                  onClick={() => setSelectedPoiId((current) => (current === poi.id ? null : poi.id))}
-                  type="button"
-                >
-                  <span>{poi.order}</span>
-                  <strong>{poi.name}</strong>
-                </button>
-              );
-            })}
-          </div>
-        </aside>
-        {/* <div className="location-filters">
-          {categories.map((category) => (
-            <button key={category} className={`pill ${filter === category ? "pill-active" : ""}`} onClick={() => setFilter(category)} type="button">
-              {category}
-            </button>
-          ))}
-        </div> */}
-      </div>
-    </section>
   );
 }
 

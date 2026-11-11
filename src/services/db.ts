@@ -2,6 +2,7 @@ import { openDB } from "idb";
 import type { Project } from "../types/project";
 import { initialProject } from "../data/initialProject";
 import { fetchRemoteProject } from "./files";
+import { migrateLocation } from "../data/locationContent";
 import { migratePlans } from "../data/migratePlans";
 
 const DB_NAME = "bustamante-175-local";
@@ -78,5 +79,5 @@ export function prepareProject(project: Project): Project {
     })
     .sort((a, b) => a.order - b.order);
 
-  return migratePlans({ ...project, logoSrc, about, galleries, sections, pointsOfInterest });
+  return migrateLocation(migratePlans({ ...project, logoSrc, about, galleries, sections, pointsOfInterest }));
 }

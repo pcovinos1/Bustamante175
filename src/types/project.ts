@@ -90,11 +90,18 @@ export interface Typology {
 export interface PointOfInterest {
   id: string;
   name: string;
-  category: "Gastronomía" | "Parques" | "Educación" | "Tiendas" | "Entretenimiento";
+  category: "Gastronomía" | "Parques" | "Educación" | "Tiendas" | "Entretenimiento" | "Arte y cultura" | "Espacios abiertos" | "Markets" | "Otros";
   x: number;
   y: number;
   visible: boolean;
   order: number;
+  featured?: boolean;
+  positioned?: boolean;
+  photoSrc?: string;
+  photoCredit?: Pick<LocationPhoto, "credit" | "sourceUrl" | "licenseUrl">;
+  walkingMinutes?: number;
+  walkingSource?: string;
+  walkingVerified?: boolean;
 }
 
 export interface ChangeLog {
@@ -146,6 +153,7 @@ export interface GeneralPlan {
 }
 
 export interface Project {
+  location?: LocationContent;
   generalPlans?: GeneralPlan[];
   plansRevision?: string;
   id: string;
@@ -174,4 +182,44 @@ export interface Project {
   adminPin: string;
   lastPublishedSnapshot?: Project;
   localDraft?: boolean;
+}
+
+export interface MapPosition {
+  x: number;
+  y: number;
+}
+
+export interface MapView extends MapPosition {
+  zoom: number;
+}
+
+export interface LocationPhoto {
+  id: string;
+  title: string;
+  description: string;
+  src: string;
+  active: boolean;
+  credit?: string;
+  sourceUrl?: string;
+  licenseUrl?: string;
+}
+
+export interface LocationContent {
+  storytelling: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    mainImageId?: string;
+    images: LocationPhoto[];
+  };
+  map: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    imageSrc: string;
+    crop?: { x: number; y: number; width: number; height: number };
+    projectPosition?: MapPosition;
+    initialView: MapView;
+  };
+  archivedPoints?: PointOfInterest[];
 }
