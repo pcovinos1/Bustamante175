@@ -79,5 +79,6 @@ export function prepareProject(project: Project): Project {
     })
     .sort((a, b) => a.order - b.order);
 
-  return migrateLocation(migratePlans({ ...project, logoSrc, about, galleries, sections, pointsOfInterest }));
+  const adminPin = project.adminPin ?? initialProject.adminPin;
+  return migrateLocation(migratePlans({ ...project, adminPin, logoSrc, about, galleries, sections, pointsOfInterest }));
 }

@@ -49,7 +49,7 @@ export async function exportProjectZip(project: Project): Promise<void> {
 
 export async function exportProjectJson(project: Project): Promise<void> {
   const optimizedProject = await optimizeProjectForJson(await embedLocationAssets(project));
-  const blob = new Blob([serializeProject(optimizedProject)], { type: "application/json" });
+  const blob = new Blob([serializeProject({ ...optimizedProject, adminPin: undefined })], { type: "application/json" });
   downloadBlob(blob, "project.json");
 }
 
@@ -133,7 +133,7 @@ async function compressRasterDataUrl(src: string, maxDimension: number, quality:
   return next.length < src.length ? next : src;
 }
 
-function serializeProject(project: Project): string {
+function serializeProject(project: Omit<Project, "adminPin"> & { adminPin?: string }): string {
   const seen = new WeakSet<object>();
   return JSON.stringify(
     project,
