@@ -18,11 +18,14 @@ assert.deepEqual(migrated.floorPlan.hotspots[0], { ...original.floorPlan.hotspot
 assert.equal(original.floorPlan.hotspots[0].typologyId, 'flat-303');
 assert.equal(migrated.version, original.version);
 assert.equal(migratePlans(migrated), migrated);
-assert.equal(plans.typologies.length, 38);
-assert.equal(new Set(plans.typologies.map(plan => plan.id)).size, 38);
+assert.equal(plans.typologies.length, 36);
+assert.equal(new Set(plans.typologies.map(plan => plan.id)).size, 36);
 assert.equal(plans.generalPlans.length, 5);
 assert.equal(plans.typologies.find(plan => plan.id === 'flat-x-08').bedrooms, 1);
 assert.deepEqual(project.typologies, plans.typologies);
+assert.deepEqual(project.generalPlans, plans.generalPlans);
+assert.equal(project.floorPlan.imageSrc, plans.generalPlans.find(plan => plan.id === 'planta-tipica').planSrc);
+assert.equal(migratePlans(project), project);
 for (const plan of [...plans.typologies, ...plans.generalPlans]) {
   for (const key of ['planSrc', 'thumbnailSrc', 'floorThumbnailSrc']) {
     if (plan[key]) assert.ok(fs.existsSync('public/' + plan[key]), plan[key]);
