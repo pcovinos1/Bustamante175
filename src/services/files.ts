@@ -12,7 +12,7 @@ export function fileToDataUrl(file: File): Promise<string> {
 }
 
 export function isAllowedAsset(file: File): boolean {
-  return ["image/png", "image/jpeg", "image/svg+xml", "application/pdf"].includes(file.type);
+  return ["image/png", "image/jpeg", "image/svg+xml", "image/webp", "application/pdf"].includes(file.type);
 }
 
 export function formatBytes(bytes: number): string {
@@ -103,7 +103,7 @@ function serializeProject(project: Project): string {
   return JSON.stringify(
     project,
     (key, value) => {
-      if (key === "lastPublishedSnapshot") return undefined;
+      if (key === "lastPublishedSnapshot" || key === "localDraft") return undefined;
       if (value && typeof value === "object") {
         if (seen.has(value)) return undefined;
         seen.add(value);

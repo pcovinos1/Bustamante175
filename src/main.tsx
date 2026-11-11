@@ -1,14 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import IntroPin from "./components/IntroPin";
 import { ProjectProvider } from "./context/ProjectContext";
 import "./styles/index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ProjectProvider>
-      <App />
-    </ProjectProvider>
+    <IntroPin>
+      <ProjectProvider>
+        <App />
+      </ProjectProvider>
+    </IntroPin>
   </React.StrictMode>
 );
 

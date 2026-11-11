@@ -1,14 +1,18 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { getProject, saveProject } from "../services/db";
-import { fetchRemoteProject } from "../services/files";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { getProject, prepareProject, saveProject } from "../services/db";
+import { compareProjectVersions, fetchRemoteProject } from "../services/files";
 import type { Project } from "../types/project";
+
+type SaveStatus = "idle" | "saving" | "saved" | "error";
+type ProjectUpdate = Project | ((project: Project) => Project);
+type SaveMode = "edit" | "publish" | "replace";
 
 interface ProjectContextValue {
   project: Project | null;
   loading: boolean;
-  updateProject: (updater: Project | ((project: Project) => Project)) => Promise<void>;
-  reload: () => Promise<void>;
-  syncFromRemote: () => Promise<Project | null>;
+  saveStatus: SaveStatus;
+  updateProject: (updater: ProjectUpdate, mode?: SaveMode) => Promise<void>;
+  syncFromRemote: (replaceDraft?: boolean) => Promise<Project | null>;
 }
 
 const ProjectContext = createContext<ProjectContextValue | null>(null);
@@ -16,42 +20,63 @@ const ProjectContext = createContext<ProjectContextValue | null>(null);
 export function ProjectProvider({ children }: { children: React.ReactNode }) {
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const current = useRef<Project | null>(null);
+  const writes = useRef(Promise.resolve());
 
-  const reload = useCallback(async () => {
-    setLoading(true);
-    const next = await getProject();
+  const updateProject = useCallback(async (updater: ProjectUpdate, mode: SaveMode = "edit") => {
+    const previous = current.current;
+    if (!previous) return;
+    const updated = typeof updater === "function" ? updater(previous) : updater;
+    const next = mode === "replace"
+      ? prepareProject({ ...updated, localDraft: false })
+      : { ...updated, localDraft: mode === "edit" };
+    current.current = next;
     setProject(next);
-    setLoading(false);
-    void fetchRemoteProject(next)
-      .then(async (remote) => {
-        if (!remote) return;
-        await saveProject(remote);
-        setProject(remote);
-      })
-      .catch(() => undefined);
+    setSaveStatus("saving");
+    if (mode === "edit") {
+      // The project includes large images. Batch rapid input changes into one IndexedDB write.
+      await new Promise<void>((resolve) => window.setTimeout(resolve, 350));
+      if (current.current !== next) return;
+    }
+    const write = writes.current.then(() => saveProject(next));
+    writes.current = write.catch(() => undefined);
+    try {
+      await write;
+      if (current.current === next) setSaveStatus("saved");
+    } catch (error) {
+      if (current.current === next) {
+        if (mode !== "edit") {
+          current.current = previous;
+          setProject(previous);
+        }
+        setSaveStatus("error");
+      }
+      throw error;
+    }
   }, []);
+
+  const syncFromRemote = useCallback(async (replaceDraft = false) => {
+    const before = current.current;
+    if (!before || (before.localDraft && !replaceDraft)) return null;
+    const remote = await fetchRemoteProject(before);
+    const latest = current.current;
+    if (!remote || latest !== before || compareProjectVersions(remote, latest) <= 0) return null;
+    await updateProject(remote, "replace");
+    return remote;
+  }, [updateProject]);
 
   useEffect(() => {
-    reload();
-  }, [reload]);
-
-  const updateProject = useCallback(async (updater: Project | ((project: Project) => Project)) => {
-    setProject((current) => {
-      if (!current) return current;
-      const next = typeof updater === "function" ? updater(current) : updater;
-      void saveProject(next);
-      return next;
+    let active = true;
+    void getProject().then((next) => {
+      if (!active) return;
+      current.current = next;
+      setProject(next);
+      setLoading(false);
+      if (navigator.onLine) void syncFromRemote().catch(() => undefined);
     });
-  }, []);
-
-  const syncFromRemote = useCallback(async () => {
-    const current = await getProject();
-    const remote = await fetchRemoteProject(current);
-    if (!remote) return null;
-    await saveProject(remote);
-    setProject(remote);
-    return remote;
-  }, []);
+    return () => { active = false; };
+  }, [syncFromRemote]);
 
   useEffect(() => {
     const syncWhenOnline = () => {
@@ -72,7 +97,17 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     };
   }, [syncFromRemote]);
 
-  const value = useMemo(() => ({ project, loading, updateProject, reload, syncFromRemote }), [project, loading, updateProject, reload, syncFromRemote]);
+  useEffect(() => {
+    if (saveStatus !== "saving" && saveStatus !== "error") return;
+    const preventLoss = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", preventLoss);
+    return () => window.removeEventListener("beforeunload", preventLoss);
+  }, [saveStatus]);
+
+  const value = useMemo(() => ({ project, loading, saveStatus, updateProject, syncFromRemote }), [project, loading, saveStatus, updateProject, syncFromRemote]);
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;
 }
 

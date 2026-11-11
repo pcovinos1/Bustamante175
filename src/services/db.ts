@@ -16,31 +16,20 @@ const dbPromise = openDB(DB_NAME, 1, {
 
 export async function getProject(): Promise<Project> {
   const db = await safeDb();
-  if (!db) return fetchRemoteProject().catch(() => null).then((project) => migratePlans(project ?? initialProject));
+  if (!db) return fetchRemoteProject().catch(() => null).then((project) => prepareProject(project ?? initialProject));
 
   const saved = await db.get(STORE, PROJECT_KEY).catch(() => undefined);
-  if (saved) {
-    const normalized = migratePlans(normalizeProject(saved as Project));
-    await db.put(STORE, normalized, PROJECT_KEY).catch(() => undefined);
-    return normalized;
-  }
+  if (saved) return prepareProject(saved as Project);
   const published = await fetchRemoteProject().catch(() => null);
-  const project = migratePlans(published ?? initialProject);
+  const project = prepareProject(published ?? initialProject);
   await db.put(STORE, project, PROJECT_KEY).catch(() => undefined);
   return project;
 }
 
 export async function saveProject(project: Project): Promise<void> {
   const db = await safeDb();
-  if (!db) return;
+  if (!db) throw new Error("El almacenamiento local no está disponible.");
   await db.put(STORE, project, PROJECT_KEY);
-}
-
-export async function resetProject(): Promise<Project> {
-  const db = await safeDb();
-  const project = migratePlans(initialProject);
-  await db?.put(STORE, project, PROJECT_KEY).catch(() => undefined);
-  return project;
 }
 
 async function safeDb() {
@@ -48,17 +37,17 @@ async function safeDb() {
   return dbPromise.catch(() => null);
 }
 
-function normalizeProject(project: Project): Project {
+export function prepareProject(project: Project): Project {
   const logoSrc = typeof project.logoSrc === "string" ? project.logoSrc : initialProject.logoSrc;
   const about = project.about
     ? {
         ...initialProject.about,
         ...project.about,
-        slides: project.about.slides?.length ? project.about.slides : initialProject.about.slides,
-        projects: project.about.projects?.length
+        slides: project.about.slides ?? initialProject.about.slides,
+        projects: project.about.projects
           ? project.about.projects.map((item, index) => ({
               ...item,
-              year: typeof item.year === "string" && item.year ? item.year : "2020",
+              year: typeof item.year === "string" ? item.year : "2020",
               order: typeof item.order === "number" ? item.order : index + 1
             }))
           : initialProject.about.projects
@@ -70,17 +59,6 @@ function normalizeProject(project: Project): Project {
       galleries.push(gallery);
     }
   }
-  const initialBarrio = initialProject.galleries.find((gallery) => gallery.id === "barrio");
-  const normalizedGalleries = galleries.map((gallery) => {
-    if (gallery.id !== "barrio" || !initialBarrio?.images[0]) return gallery;
-    const firstImage = gallery.images[0];
-    if (!firstImage || firstImage.src.startsWith("data:")) return gallery;
-    return {
-      ...gallery,
-      images: [{ ...firstImage, src: initialBarrio.images[0].src, title: initialBarrio.images[0].title }, ...gallery.images.slice(1)]
-    };
-  });
-
   const sections = [...project.sections];
   for (const section of initialProject.sections) {
     if (!sections.some((item) => item.id === section.id)) {
@@ -88,26 +66,17 @@ function normalizeProject(project: Project): Project {
     }
   }
 
-  const mergedPoints = [...project.pointsOfInterest];
-  for (const point of initialProject.pointsOfInterest) {
-    if (!mergedPoints.some((item) => item.id === point.id)) {
-      mergedPoints.push(point);
-    }
-  }
-
-  const initialPointsById = new Map(initialProject.pointsOfInterest.map((point) => [point.id, point]));
-  const pointsOfInterest = mergedPoints
+  const pointsOfInterest = (project.pointsOfInterest ?? initialProject.pointsOfInterest)
     .map((point, index) => {
-      const initialPoint = initialPointsById.get(point.id);
       const rawCategory = String(point.category);
       return {
         ...point,
-        category: rawCategory === "Cafés" ? "Gastronomía" : (initialPoint?.category ?? point.category),
+        category: rawCategory === "Cafés" ? "Gastronomía" : point.category,
         visible: typeof point.visible === "boolean" ? point.visible : true,
         order: typeof point.order === "number" ? point.order : index + 1
       };
     })
     .sort((a, b) => a.order - b.order);
 
-  return { ...project, logoSrc, about, galleries: normalizedGalleries, sections, pointsOfInterest };
+  return migratePlans({ ...project, logoSrc, about, galleries, sections, pointsOfInterest });
 }

@@ -1,5 +1,5 @@
 import { Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { FloorPlan, Hotspot, Typology } from "../types/project";
 
 interface Props {
@@ -7,13 +7,16 @@ interface Props {
   typologies: Typology[];
   selectedId?: string;
   editable?: boolean;
+  selectedZoneId?: string;
+  onZoneSelect?: (zone: Hotspot) => void;
+  inspector?: ReactNode;
   onSelect: (typologyId: string) => void;
   onHotspotAdd?: (hotspot: Hotspot) => void;
   onHotspotDelete?: (id: string) => void;
   onHotspotChange?: (hotspot: Hotspot) => void;
 }
 
-export function FloorPlanInteractive({ floorPlan, typologies, selectedId, editable, onSelect, onHotspotChange, onHotspotAdd, onHotspotDelete }: Props) {
+export function FloorPlanInteractive({ floorPlan, typologies, selectedId, editable, selectedZoneId, onZoneSelect, inspector, onSelect, onHotspotChange, onHotspotAdd, onHotspotDelete }: Props) {
   const byId = new Map(typologies.map((typology) => [typology.id, typology]));
   const [imageRatio, setImageRatio] = useState<number | null>(null);
 
@@ -38,7 +41,7 @@ export function FloorPlanInteractive({ floorPlan, typologies, selectedId, editab
     onHotspotAdd?.({ id: crypto.randomUUID(), typologyId: targetId, x: Math.min(point.x, corner.x), y: Math.min(point.y, corner.y), width, height });
     setDrawing(false);
     setCorner(null);
-    onSelect(targetId);
+    if (!onZoneSelect) onSelect(targetId);
   }
 
   function update(hotspot: Hotspot, patch: Partial<Hotspot>) {
@@ -54,25 +57,24 @@ export function FloorPlanInteractive({ floorPlan, typologies, selectedId, editab
     });
   }
 
-  return (
-    <div className="overflow-hidden rounded border border-ink/10 bg-white">
+  const canvas = (
+    <>
       {editable && (
         <div className="space-y-3 border-b border-ink/10 bg-paper p-4">
           <div className="flex flex-wrap items-end gap-3">
-            <label className="min-w-48 flex-1">Tipología para la nueva zona
+            <label className="min-w-48 flex-1">Tipología
               <select className="field" value={targetId} onChange={(event) => onSelect(event.target.value)} disabled={!typologies.length || drawing}>
                 {typologies.map((item) => <option key={item.id} value={item.id}>{item.code}</option>)}
               </select>
             </label>
             <button className="primary-touch disabled:opacity-50" type="button" disabled={!targetId || !onHotspotAdd} onClick={addZone}>
-              <Plus className="size-4" /> Agregar zona clicable
+              <Plus className="size-4" /> Dibujar zona
             </button>
             {drawing && <button className="secondary-touch" type="button" onClick={() => { setDrawing(false); setCorner(null); }}>Cancelar marcado</button>}
           </div>
-          <p role="status">{drawing ? corner ? "Haz clic en la esquina opuesta (separada al menos 1% en cada dirección)." : "Haz clic en la primera esquina del área." : "Pulsa Agregar zona clicable y marca dos esquinas sobre el plano."}</p>
-          <p className="text-sm text-ink/70">Elige una tipología y agrega una zona. Marca el área con dos clics. Para afinarla, usa los botones − y + o escribe los porcentajes debajo del plano. Los cambios se guardan automáticamente en este navegador.</p>
-          {!typologies.length && <p role="status">Primero agrega una tipología.</p>}
-          {!floorPlan.hotspots.length && <p role="status">Todavía no hay zonas clicables.</p>}
+          <p className="text-sm text-ink/70" role="status">
+            {drawing ? corner ? "Marca la esquina opuesta de la zona." : "Marca la primera esquina de la zona." : "Selecciona una zona en el plano para editarla."}
+          </p>
         </div>
       )}
       <div className="relative mx-auto w-full" style={imageRatio ? { aspectRatio: `${imageRatio}` } : undefined}>
@@ -88,7 +90,7 @@ export function FloorPlanInteractive({ floorPlan, typologies, selectedId, editab
         />
         {floorPlan.hotspots.map((hotspot) => {
           const typology = byId.get(hotspot.typologyId);
-          const active = selectedId === hotspot.typologyId;
+          const active = selectedZoneId ? selectedZoneId === hotspot.id : selectedId === hotspot.typologyId;
           if (!typology) return null;
           return (
             <button
@@ -103,9 +105,10 @@ export function FloorPlanInteractive({ floorPlan, typologies, selectedId, editab
                     }`
               }
               style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%`, width: `${hotspot.width}%`, height: `${hotspot.height}%` }}
-              onClick={() => onSelect(hotspot.typologyId)}
+              onClick={() => onZoneSelect ? onZoneSelect(hotspot) : onSelect(hotspot.typologyId)}
               type="button"
-              aria-label={`Seleccionar tipología ${typology.code}`}
+              aria-label={editable ? `Seleccionar zona de ${typology.code}` : `Seleccionar tipología ${typology.code}`}
+              aria-pressed={editable ? selectedZoneId === hotspot.id : undefined}
             >
               {editable ? typology.code : null}
 
@@ -118,14 +121,31 @@ export function FloorPlanInteractive({ floorPlan, typologies, selectedId, editab
           </button>
         )}
       </div>
+    </>
+  );
+
+  return (
+    <div className={editable ? "admin-floor-editor" : "overflow-hidden rounded border border-ink/10 bg-white"}>
+      {editable ? <div className="admin-floor-canvas">{canvas}</div> : canvas}
       {editable ? (
-        <div className="grid gap-3 border-t border-ink/10 bg-paper p-4 md:grid-cols-2 xl:grid-cols-4">
-          {floorPlan.hotspots.map((hotspot) => {
+        <aside className="admin-floor-inspector" aria-label="Propiedades de la planta">
+          {floorPlan.hotspots.length > 0 && onZoneSelect && (
+            <label>Zona seleccionada
+              <select className="field" value={selectedZoneId ?? ""} onChange={(event) => {
+                const zone = floorPlan.hotspots.find((item) => item.id === event.target.value);
+                if (zone) onZoneSelect(zone);
+              }}>
+                <option value="" disabled>Selecciona una zona</option>
+                {floorPlan.hotspots.map((zone, index) => <option key={zone.id} value={zone.id}>{index + 1}. {byId.get(zone.typologyId)?.code ?? "Sin asignar"}</option>)}
+              </select>
+            </label>
+          )}
+          {floorPlan.hotspots.filter((zone) => !onZoneSelect || zone.id === selectedZoneId).map((hotspot) => {
             const typology = byId.get(hotspot.typologyId);
             return (
               <div key={hotspot.id} className="rounded border border-ink/10 bg-white p-3">
                 <label className="mb-3 block text-sm">Tipología de la zona
-                  <select className="field" value={hotspot.typologyId} onChange={(event) => { update(hotspot, { typologyId: event.target.value }); onSelect(event.target.value); }}>
+                  <select className="field" value={hotspot.typologyId} onChange={(event) => { const updated = { ...hotspot, typologyId: event.target.value }; update(hotspot, updated); if (onZoneSelect) onZoneSelect(updated); else onSelect(updated.typologyId); }}>
                     {!typology && <option value={hotspot.typologyId}>Selecciona una tipología</option>}
                     {typologies.map((item) => <option key={item.id} value={item.id}>{item.code}</option>)}
                   </select>
@@ -145,7 +165,8 @@ export function FloorPlanInteractive({ floorPlan, typologies, selectedId, editab
               </div>
             );
           })}
-        </div>
+          {inspector}
+        </aside>
       ) : null}
     </div>
   );

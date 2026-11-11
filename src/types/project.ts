@@ -173,4 +173,5 @@ export interface Project {
   version: ProjectVersion;
   adminPin: string;
   lastPublishedSnapshot?: Project;
+  localDraft?: boolean;
 }
