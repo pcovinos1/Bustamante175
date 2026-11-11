@@ -20,14 +20,14 @@ export function LocationPage({ project, initialScreen = "story" }: { project: Pr
   const isStory = screen === "story";
   const crop = location.map.crop;
   const [imageId, setImageId] = useState(location.storytelling.mainImageId);
-  const [filter, setFilter] = useState("Destacados");
+  const [filter, setFilter] = useState("Todos");
   const [selectedId, setSelectedId] = useState<string>();
   const images = location.storytelling.images.filter((image) => image.active);
   const active = images.find((image) => image.id === imageId) ?? images[0];
   const activeIndex = images.findIndex((image) => image.id === active?.id);
   const allVisible = content.pointsOfInterest.filter((point) => point.visible && point.positioned !== false).sort((a, b) => a.order - b.order);
   const categories = [...new Set(allVisible.map((point) => point.category))];
-  const points = allVisible.filter((point) => filter === "Destacados" ? point.featured : filter === "Todos" || point.category === filter);
+  const points = allVisible.filter((point) => filter === "Todos" || point.category === filter);
   const selected = points.find((point) => point.id === selectedId);
 
   function nextImage(direction: number) {
@@ -115,7 +115,7 @@ export function LocationPage({ project, initialScreen = "story" }: { project: Pr
             <p className="neighborhood-description">{location.map.description}</p>
             <p className="neighborhood-address">{project.address}</p>
             <div className="neighborhood-filters" aria-label="Categorías del entorno">
-              {["Destacados", "Todos", ...categories].map((category) => <button key={category} type="button" aria-pressed={filter === category} onClick={() => { setFilter(category); setSelectedId(undefined); }}>{category}</button>)}
+              {["Todos", ...categories].map((category) => <button key={category} type="button" aria-pressed={filter === category} onClick={() => { setFilter(category); setSelectedId(undefined); }}>{category}</button>)}
             </div>
             <div className="neighborhood-place-list" aria-label="Lugares del mapa">
               {points.map((point) => <button key={point.id} type="button" aria-pressed={selectedId === point.id} onClick={() => setSelectedId(point.id)}><span>{point.order}</span>{point.name}</button>)}
