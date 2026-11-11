@@ -1,14 +1,24 @@
-import { useState } from "react";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Footprints, X } from "lucide-react";
+import { useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Footprints, Hand, MapPin, X } from "lucide-react";
 import type { Project } from "../../types/project";
 import { migrateLocation } from "../../data/locationContent";
 import { NeighborhoodMap } from "./NeighborhoodMap";
 import "../../styles/location.css";
 
+function allowsScreenGesture(target: EventTarget | null) {
+  return target instanceof Element && !target.closest(
+    ".neighborhood-map-area, .neighborhood-filmstrip, button, a, input, select, textarea"
+  );
+}
+
 export function LocationPage({ project, initialScreen = "story" }: { project: Project; initialScreen?: "story" | "map" }) {
   const content = migrateLocation(project);
   const location = content.location!;
   const [screen, setScreen] = useState(initialScreen);
+  const pointer = useRef<{ id: number; x: number; y: number }>();
+  const wheel = useRef({ lastAt: 0, distance: 0, changed: false });
+  const isStory = screen === "story";
+  const crop = location.map.crop;
   const [imageId, setImageId] = useState(location.storytelling.mainImageId);
   const [filter, setFilter] = useState("Destacados");
   const [selectedId, setSelectedId] = useState<string>();
@@ -24,12 +34,58 @@ export function LocationPage({ project, initialScreen = "story" }: { project: Pr
     if (images.length) setImageId(images[(activeIndex + direction + images.length) % images.length].id);
   }
 
+  function navigate(next: "story" | "map") {
+    pointer.current = undefined;
+    setScreen(next);
+    setSelectedId(undefined);
+  }
+
+  function swipe(distance: number) {
+    if (isStory && distance < -55) navigate("map");
+    else if (!isStory && distance > 55) navigate("story");
+  }
+
   return (
-    <section className="neighborhood-experience" aria-label="Ubicación y entorno">
+    <section
+      className="neighborhood-experience"
+      aria-label="Ubicación y entorno"
+      onPointerDown={(event) => {
+        if (!event.isPrimary) return;
+        pointer.current = undefined;
+        if (event.button !== 0 || !allowsScreenGesture(event.target)) return;
+        pointer.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
+      }}
+      onPointerUp={(event) => {
+        const start = pointer.current;
+        if (start?.id !== event.pointerId) return;
+        pointer.current = undefined;
+        const x = event.clientX - start.x;
+        const y = event.clientY - start.y;
+        if (Math.abs(x) > Math.abs(y) * 1.45) swipe(x);
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === "mouse") pointer.current = undefined;
+      }}
+      onPointerCancel={(event) => {
+        if (pointer.current?.id === event.pointerId) pointer.current = undefined;
+      }}
+      onWheel={(event) => {
+        if (!allowsScreenGesture(event.target) || event.ctrlKey) return;
+        const now = performance.now();
+        if (now - wheel.current.lastAt > 200) wheel.current = { lastAt: now, distance: 0, changed: false };
+        wheel.current.lastAt = now;
+        if (wheel.current.changed || Math.abs(event.deltaX) <= Math.abs(event.deltaY) * 1.45) return;
+        wheel.current.distance += event.deltaX * (event.deltaMode === 1 ? 16 : 1);
+        if ((isStory && wheel.current.distance > 55) || (!isStory && wheel.current.distance < -55)) {
+          wheel.current.changed = true;
+          swipe(-wheel.current.distance);
+        }
+      }}
+    >
       {screen === "story" ? (
-        <div className="neighborhood-story">
+        <div key="story" className="neighborhood-story neighborhood-slide">
           <div className="neighborhood-hero">
-            {images.map((image) => <img key={image.id} src={image.src} alt={image.description || image.title} aria-hidden={active?.id !== image.id} className={active?.id === image.id ? "is-current" : ""} />)}
+            {images.map((image) => <img key={image.id} src={image.src} draggable={false} alt={image.description || image.title} aria-hidden={active?.id !== image.id} className={active?.id === image.id ? "is-current" : ""} />)}
             <div className="neighborhood-story-copy">
               <p className="neighborhood-eyebrow">{location.storytelling.eyebrow}</p>
               <h1>{location.storytelling.title}</h1>
@@ -52,7 +108,7 @@ export function LocationPage({ project, initialScreen = "story" }: { project: Pr
           </div>
         </div>
       ) : (
-        <div className="neighborhood-location">
+        <div key="map" className="neighborhood-location neighborhood-slide">
           <aside className="neighborhood-map-copy">
             <p className="neighborhood-eyebrow">{location.map.eyebrow}</p>
             <h1>{location.map.title}</h1>
@@ -84,12 +140,31 @@ export function LocationPage({ project, initialScreen = "story" }: { project: Pr
           </div>
         </div>
       )}
-      <footer className="neighborhood-pagination">
-        <span aria-live="polite">{screen === "story" ? "01" : "02"} <span>/ 02</span></span>
-        <button type="button" onClick={() => { setScreen(screen === "story" ? "map" : "story"); setSelectedId(undefined); }}>
-          {screen === "map" && <ArrowLeft size={21} />}
-          {screen === "story" ? "Explorar la ubicación" : "Descubrir Barranco"}
-          {screen === "story" && <ArrowRight size={21} />}
+      <footer className="neighborhood-pagination" data-screen={screen}>
+        <div className="neighborhood-progress" aria-live="polite" aria-atomic="true">
+          <span className="neighborhood-progress-count">{isStory ? "01" : "02"} <span>/ 02</span></span>
+          <span className="neighborhood-progress-label">{isStory ? "Descubre Barranco" : "Explora el entorno"}</span>
+          <div className="neighborhood-progress-track" aria-hidden="true"><span /><span /></div>
+        </div>
+        {isStory && (
+          <>
+            <div className="neighborhood-swipe-hint">
+              <span aria-hidden="true"><ArrowLeft size={13} /><Hand size={19} /></span>
+              Desliza hacia la izquierda para explorar el mapa
+            </div>
+            <button className="neighborhood-map-preview" type="button" aria-label="Abrir vista previa del mapa del entorno" onClick={() => navigate("map")}>
+              <img src={location.map.imageSrc} alt="" draggable={false} style={crop ? {
+                width: `${100 / crop.width}%`, height: `${100 / crop.height}%`,
+                left: `${-crop.x / crop.width * 100}%`, top: `${-crop.y / crop.height * 100}%`
+              } : undefined} />
+              <MapPin size={15} aria-hidden="true" />
+            </button>
+          </>
+        )}
+        <button className="neighborhood-pagination-action" type="button" onClick={() => navigate(isStory ? "map" : "story")}>
+          {isStory ? <MapPin size={18} /> : <ArrowLeft size={18} />}
+          {isStory ? "Ver mapa del entorno" : "Descubre Barranco"}
+          {isStory && <ArrowRight size={18} />}
         </button>
       </footer>
     </section>
