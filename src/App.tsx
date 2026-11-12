@@ -8,7 +8,7 @@ import { PlanViewer } from "./components/PlanViewer";
 import { useProject } from "./context/ProjectContext";
 import { LocationPage } from "./components/location/LocationPage";
 import { AdminPage } from "./components/AdminPage";
-import type { Gallery, GalleryImage, Project, Typology, ViewKey } from "./types/project";
+import type { Gallery, GalleryImage, GeneralPlan, Project, Typology, ViewKey } from "./types/project";
 
 const menuItems: Array<{ view: ViewKey; title: string; text: string }> = [
   { view: "about", title: "About us", text: "La visión y origen de Morada." },
@@ -29,8 +29,11 @@ export default function App() {
   const visibleView = preview ?? view;
   const [selectedTypologyId, setSelectedTypologyId] = useState("a-1");
   const [planTypologyIds, setPlanTypologyIds] = useState<string[] | null>(null);
+  const [generalPlanId, setGeneralPlanId] = useState("");
   const [gallery, setGallery] = useState<{ images: GalleryImage[]; index: number } | null>(null);
 
+  const typicalPlan = project?.generalPlans?.find((plan) => plan.id === "planta-tipica");
+  const generalPlan = project?.generalPlans?.find((plan) => plan.id === generalPlanId);
   const selectedTypology = project?.typologies.find((item) => item.id === selectedTypologyId) ?? project?.typologies[0];
   const navigate = (next: ViewKey) => {
     if (next === "location") setLocationScreen("story");
@@ -43,6 +46,15 @@ export default function App() {
   const openTypology = (id: string, ids: string[]) => {
     setSelectedTypologyId(id);
     setPlanTypologyIds(ids);
+  };
+
+  const showFloor = () => {
+    if (typicalPlan) {
+      setGeneralPlanId(typicalPlan.id);
+      return;
+    }
+    setPlanTypologyIds(null);
+    navigate("floor");
   };
 
   if (loading || !project) {
@@ -74,7 +86,7 @@ export default function App() {
           {visibleView === "amenities" && <AmenitiesPage project={project} onOpenGallery={setGallery} />}
           {visibleView === "interiors" && <InteriorsPage project={project} onOpenGallery={setGallery} />}
           {visibleView === "location" && <LocationPage key={locationScreen} project={project} initialScreen={locationScreen} />}
-          {visibleView === "departments" && <DepartmentsPage project={project} selectedTypologyId={selectedTypologyId} setSelectedTypologyId={setSelectedTypologyId} onNavigate={navigate} onOpenTypology={openTypology} />}
+          {visibleView === "departments" && <DepartmentsPage project={project} selectedTypologyId={selectedTypologyId} setSelectedTypologyId={setSelectedTypologyId} onNavigate={navigate} onOpenTypology={openTypology} onOpenGeneralPlan={setGeneralPlanId} onShowFloor={showFloor} />}
           {visibleView === "floor" && (
             <FloorPage
               project={project}
@@ -89,12 +101,10 @@ export default function App() {
               typologyIds={planTypologyIds}
               setSelectedTypologyId={setSelectedTypologyId}
               onClose={() => setPlanTypologyIds(null)}
-              onShowFloor={() => {
-                setPlanTypologyIds(null);
-                navigate("floor");
-              }}
+              onShowFloor={showFloor}
             />
           )}
+          {generalPlan && <GeneralPlanDialog key={generalPlan.id} plan={generalPlan} onClose={() => setGeneralPlanId("")} />}
           {visibleView === "compare" && <ComparePage project={project} />}
           {visibleView === "contact" && <ContactPage project={project} />}
           {gallery ? <GalleryModal images={gallery.images} initialIndex={gallery.index} onClose={() => setGallery(null)} /> : null}
@@ -520,11 +530,9 @@ function ParallaxStory({ eyebrow, title, text, gallery, labels, onOpenGallery }:
   );
 }
 
-function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, onNavigate, onOpenTypology }: { project: Project; selectedTypologyId: string; setSelectedTypologyId: (id: string) => void; onNavigate: (view: ViewKey) => void; onOpenTypology: (id: string, ids: string[]) => void }) {
+function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, onNavigate, onOpenTypology, onOpenGeneralPlan, onShowFloor }: { project: Project; selectedTypologyId: string; setSelectedTypologyId: (id: string) => void; onNavigate: (view: ViewKey) => void; onOpenTypology: (id: string, ids: string[]) => void; onOpenGeneralPlan: (id: string) => void; onShowFloor: () => void }) {
   const [bedrooms, setBedrooms] = useState("Todos");
   const [area, setArea] = useState("Todas");
-  const [generalPlanId, setGeneralPlanId] = useState("");
-  const generalPlan = project.generalPlans?.find(plan => plan.id === generalPlanId);
   const typologies = project.typologies.filter((item) => item.active);
   const filtered = typologies.filter((item) => (bedrooms === "Todos" || item.bedrooms === Number(bedrooms)) && (area === "Todas" || (area === "<60" ? item.areaM2 < 60 : area === "60-65" ? item.areaM2 >= 60 && item.areaM2 <= 65 : item.areaM2 > 65)));
   return (
@@ -541,7 +549,7 @@ function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, o
             {value === "Todas" ? "Todas las áreas" : value === "<60" ? "Menos de 60 m²" : value === "60-65" ? "60 a 65 m²" : "Más de 65 m²"}
           </button>
         ))}
-        <button className="primary-touch ml-auto" onClick={() => onNavigate("floor")} type="button">
+        <button className="primary-touch ml-auto" onClick={onShowFloor} type="button">
           Ver ubicación en planta <Grid3X3 />
         </button>
         <button className="secondary-touch" onClick={() => onNavigate("compare")} type="button">
@@ -569,7 +577,7 @@ function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, o
               >
                 Ver plano
               </button>
-              <button className="secondary-touch relative z-10 flex-1" onClick={() => { setSelectedTypologyId(typology.id); onNavigate("floor"); }} type="button">
+              <button className="secondary-touch relative z-10 flex-1" onClick={() => { setSelectedTypologyId(typology.id); onShowFloor(); }} type="button">
                 En planta
               </button>
             </div>
@@ -581,7 +589,7 @@ function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, o
           <h2 className="mb-4 font-display text-4xl">Planos generales</h2>
           <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-5">
             {project.generalPlans.map(plan => (
-              <button key={plan.id} type="button" className="rounded border border-ink/10 bg-porcelain p-4 text-left" onClick={() => setGeneralPlanId(plan.id)}>
+              <button key={plan.id} type="button" className="rounded border border-ink/10 bg-porcelain p-4 text-left" onClick={() => onOpenGeneralPlan(plan.id)}>
                 <img src={plan.thumbnailSrc} alt={`Plano de ${plan.title}`} className="h-40 w-full bg-white object-contain" loading="lazy" />
                 <span className="mt-3 block text-xl">{plan.title}</span>
                 <span className="text-morada">Ver plano</span>
@@ -590,16 +598,33 @@ function DepartmentsPage({ project, selectedTypologyId, setSelectedTypologyId, o
           </div>
         </div>
       )}
-      {generalPlan && (
-        <div className="fixed inset-0 z-[100] overflow-auto bg-porcelain p-4 md:p-8" role="dialog" aria-modal="true" aria-label={generalPlan.title} onKeyDown={event => { if (event.key === "Escape") setGeneralPlanId(""); }}>
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <h2 className="font-display text-4xl">{generalPlan.title}</h2>
-            <button autoFocus type="button" className="secondary-touch" onClick={() => setGeneralPlanId("")}>Cerrar plano</button>
-          </div>
-          <PlanViewer key={generalPlan.id} src={generalPlan.planSrc} title={generalPlan.title} />
-        </div>
-      )}
     </section>
+  );
+}
+
+function GeneralPlanDialog({ plan, onClose }: { plan: GeneralPlan; onClose: () => void }) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    dialog?.showModal();
+    return () => dialog?.close();
+  }, []);
+
+  return (
+    <dialog
+      ref={dialogRef}
+      className="typology-dialog fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none overflow-hidden bg-porcelain text-ink"
+      aria-label={plan.title}
+      onCancel={(event) => { event.preventDefault(); onClose(); }}
+    >
+      <div className="grid h-full grid-rows-[auto_minmax(0,1fr)] gap-4 p-4 md:p-8">
+        <header className="flex items-center justify-between gap-4">
+          <h2 className="font-display text-3xl md:text-4xl">{plan.title}</h2>
+          <button autoFocus type="button" className="secondary-touch" onClick={onClose}>Cerrar plano</button>
+        </header>
+        <PlanViewer src={plan.planSrc} title={plan.title} fitViewport />
+      </div>
+    </dialog>
   );
 }
 
